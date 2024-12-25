@@ -1,0 +1,54 @@
+{% extends 'dashboard/diagnostico.html' %}
+{% load static %} 
+{% block modulo %}
+    <div class="contenedor_tabla container container_disigne">
+        <div class="table_header">
+            <!-- <h2>Pacientes</h2> -->
+            <a href="{% url 'registro_p' %}">
+                <button>Registrar paciente</button>
+            </a>
+            <!-- <select name="" id="">
+                <option value="" selected>Tipo</option>
+            </select> -->
+
+            <div class="input_search">
+                <input type="search" name="" id="btn_buscar_p" placeholder="Buscar paciente">
+                <i class="bi bi-search" id="search"></i>
+            </div>
+        </div>
+        <div class="table_paciente">
+            <table id="tbl">
+                <caption>Pacientes registrados</caption>
+                <thead>
+                    <tr>
+                        <th># <i class="bi bi-chevron-contract"></i></th>
+                        <th>Nombres <i class="bi bi-chevron-contract"></i></th>
+                        <th>Apellidos <i class="bi bi-chevron-contract"></i></th>
+                        <th>Documento de identidad <i class="bi bi-chevron-contract"></i></th>
+                        <th>Evento <i class="bi bi-chevron-contract"></i></th>
+                    </tr>
+                </thead>
+                    
+                <tbody>
+                    {% for p in pacientes %}
+                    <tr>
+                        <td>{{ p.id }}</td>
+                        <td>{{ p.primer_nombre|add:" "|add:p.segundo_nombre }}</td>
+                        <td>{{ p.apellido_paterno|add:" "|add:p.apellido_materno }}</td>
+                        <td>{{ p.dni }}</td>
+                        <td>
+                            <a href="{% url 'diagnostico2' p.id %}" class="btn bg-transparent"><i class="bi bi-clipboard-pulse" id="icons"></i></a>
+                            <!-- <button><i class="bi bi-pencil-square" id="icons"></i></button> -->
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="table_fotter">
+            <p><i><b>Total de pacientes: {{ cantidad }}</b></i></p>
+        </div>
+    </div>
+
+    <script src="{% static 'js/jsTabla/index.js' %}"></script>
+{% endblock %}

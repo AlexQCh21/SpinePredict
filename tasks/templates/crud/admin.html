@@ -1,0 +1,61 @@
+{% extends 'crud/basecrud.html' %}
+{% load static %} 
+{% block icon_crud %}
+<i class="bi bi-person-fill-gear"></i>
+{% endblock %}
+
+{% block descripcion %}
+El sistema permite gestionar los registros de los administradores, facilitando la creación, visualización y eliminación de sus datos médicos de manera rápida y segura.
+{% endblock %}
+
+{% block crud_mod %}
+<div class="contenedor_tabla container container_disigne">
+    <div class="table_header pt-3 pl-0">
+        <a href="{% url 'registro_a' %}">
+            <button>Registrar administrador</button>
+        </a>
+        <div class="input_search">
+            <input type="search" name="" id="btn_buscar_p" placeholder="Buscar paciente">
+            <i class="bi bi-search" id="search"></i>
+        </div>
+    </div>
+    <div class="table_paciente">
+        <table id="tbl">
+            <caption>Administradores registrados</caption>
+            <thead>
+                <tr>
+                    <th># <i class="bi bi-chevron-contract"></i></th>
+                    <th>Nombres <i class="bi bi-chevron-contract"></i></th>
+                    <th>Apellidos <i class="bi bi-chevron-contract"></i></th>
+                    <th>Documento de identidad <i class="bi bi-chevron-contract"></i></th>
+                    <th>Evento <i class="bi bi-chevron-contract"></i></th>
+                </tr>
+            </thead>
+                
+            <tbody>
+                {% for p in object_list %}
+                <tr>
+                    <td>{{ p.id }}</td>
+                    <td>{{ p.primer_nombre|add:" "|add:p.segundo_nombre }}</td>
+                    <td>{{ p.apellido_paterno|add:" "|add:p.apellido_materno }}</td>
+                    <td>{{ p.dni }}</td>
+                    <td class="d-flex">
+                        <!-- <a href="#" class="btn bg-transparent text-primary"><i class="bi bi-pencil-square"></i></a> -->
+                        <!-- <a href="#" class="btn bg-transparent text-danger"><i class="bi bi-trash-fill"></i></a> -->
+                        <!-- <button><i class="bi bi-pencil-square" id="icons"></i></button> -->
+                        <form action="{% url 'desactivar_admin' p.id %}" method="POST">
+                            {% csrf_token %}
+                            <button class="btn bg-transparent text-danger" type="submit"><i class="bi bi-trash-fill"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="table_fotter">
+        <p><i><b>Total de registros: {{ cantidad }}</b></i></p>
+    </div>
+</div>
+<script src="{% static 'js/jsTabla/index.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends 'dashboard/diagnostico.html' %} {% load static %} {% block modulo %}
+<!-- <h1>{{ contexto.confidence }}</h1>
+<h1>{{ contexto.prediccion }}</h1> -->
+<div class="contenedor_etapaf">
+  <div class="etapaf_header">
+    <h2><b>Etapa final:</b> Resultado del diagnóstico</h2>
+  </div>
+
+  <div class="etapaf_contenido">
+    <div class="etapaf_resultado">
+      <!-- imagen y clase predicha -->
+      <div class="etapaf_prediccion">
+        <div class="image_p">
+          {% if contexto.prediccion == 'Hernia' %}
+              <img src="{% static 'img/hernia.png' %}" alt="" />
+          {% elif contexto.prediccion == 'Spondylolisthesis' %}
+              <img src="{% static 'img/espondilolistesis.jpg' %}" alt="" />
+          {% elif contexto.prediccion == 'Normal' %}
+              <img src="{% static 'img/normal.avif' %}" alt="" />
+          {% endif %}
+        </div>
+        <div class="prediccion">Diagnóstico: {{ contexto.prediccion }}</div>
+      </div>
+
+      <!-- Informe -->
+      <div class="etapaf_informe">
+        <div class="headerf">Detalle del Diagnostico</div>
+
+        <div class="info">
+          <div class="parametro">
+            <div class="etiqueta">Incidencia pélvica</div>
+            <div class="resultado">
+              {{ contexto.datos.first.pelvic_incidence }}
+            </div>
+          </div>
+          <div class="parametro">
+            <div class="etiqueta">Inclinación pélvica</div>
+            <div class="resultado">{{ contexto.datos.first.pelvic_tilt }}°</div>
+          </div>
+          <div class="parametro tam_2">
+            <div class="etiqueta">Ángulo de lordosis lumbar</div>
+            <div class="resultado">
+              {{ contexto.datos.first.lumbar_lordosis_angle }}°
+            </div>
+          </div>
+          <div class="parametro">
+            <div class="etiqueta">Pendiente sacra</div>
+            <div class="resultado">{{ contexto.datos.first.sacral_slope }}°</div>
+          </div>
+          <div class="parametro">
+            <div class="etiqueta">Radio pélvico</div>
+            <div class="resultado">
+              {{ contexto.datos.first.pelvic_radius }}°
+            </div>
+          </div>
+          <div class="parametro tam_2">
+            <div class="etiqueta">Grado de espondilolistesis</div>
+            <div class="resultado">
+              {{ contexto.datos.first.degree_spondylolisthesis }}°
+            </div>
+          </div>
+
+          <div class="line"></div>
+
+          <div class="parametro tam_2">
+            <div class="etiqueta">Porcentaje de precisión</div>
+            <div class="resultado">{{ contexto.confidence }} %</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="etapaf_paciente_evento">
+      <div class="image_pa d-flex flex-column align-items-center">
+        {% if not paciente.foto %}
+          <img src="{% static 'img/user_default.png' %}" alt="foto del paciente" />
+        {% else %}
+          <img src="{{ paciente.foto.url }}" alt="foto del paciente" />
+        {% endif %}
+        <b>{{ contexto.paciente.primer_nombre|add:" "|add:contexto.paciente.apellido_paterno }}</b>
+      </div>
+      <div class="eventos">
+        <a href="{% url 'informeDiagnostico' contexto.paciente.id %}" target="_blank" class="btn btn-outline-dark">Generar informe <i class="bi bi-file-earmark-arrow-down-fill"></i></a>
+        <a href="{% url 'diagnostico' %}" class="btn btn-outline-danger"
+          >Terminar</a
+        >
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

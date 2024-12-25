@@ -1,0 +1,234 @@
+{% extends 'layout/base.html' %} {% load static %}  {% block content %}
+
+<div class="contenedor_dashboard container">
+  <div class="title">
+    <h1 class="titulo">Dashboard</h1>
+    <span>Descripción general y resumen de diagnósticos</span>
+    <!-- {{ precision_n.precision_value__avg|floatformat:2 }} -->
+  </div>
+
+  <div class="cards">
+    <div class="card_dash">
+      <div class="contenido_dash">
+        <h1 class="cantidad">{{ diagnosticos_cantidad }}</h1>
+        <div class="des_dash">
+          <div class="variable">Diagnósticos</div>
+          <div class="indicador">
+            <i class="bi bi-arrow-up-short"></i> Diagnósticos realizados
+          </div>
+        </div>
+      </div>
+      <div class="icon_dash">
+        <i class="bi bi-clipboard2-pulse"></i>
+      </div>
+    </div>
+
+    <div class="card_dash">
+      <div class="contenido_dash">
+        <h1 class="cantidad">4</h1>
+        <div class="des_dash">
+          <div class="variable">Especialistas</div>
+          <div class="indicador">
+            <i class="bi bi-arrow-up-short"></i> 2% el último més
+          </div>
+        </div>
+      </div>
+      <div class="icon_dash">
+        <i class="bi bi-person-vcard"></i>
+      </div>
+    </div>
+
+    <div class="card_dash">
+      <div class="contenido_dash">
+        <h1 class="cantidad">{{ cantidad_paciente }}</h1>
+        <div class="des_dash">
+          <div class="variable">Pacientes</div>
+          <div class="indicador">+ pacientes en el sistema</div>
+        </div>
+      </div>
+      <div class="icon_dash">
+        <i class="bi bi-person-heart"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- <div class="graficos">
+    <div class="row_g">
+      <div class="chart">
+        <canvas id="chart_1"></canvas>
+      </div>
+      <div class="chart">
+        <canvas id="chart_2"></canvas>
+      </div>
+    </div>
+  </div> -->
+
+  <!-- Añadir graficos -->
+  <div class="graphBox">
+    <div class="box">
+      <canvas id="chart_2"></canvas>
+    </div>
+    <div class="box">
+      <canvas id="chart_1"></canvas>
+    </div>
+    
+  </div>
+
+  <div class="graphBox d-flex">
+    <div class="box ancho_t">
+      <canvas id="chart_3"></canvas>
+    </div>
+  </div>
+
+  <div class="tabla_pacientes_diag">
+    <div class="tabla_contenido">
+      <h1>Diagnósticos de Pacientes</h1>
+      <div class="tabla_pacientes_d" style="max-height: 400px; overflow-y: auto;">
+        <table class="table tabla_p" >
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Nombres</th>
+              <th scope="col">Apellidos</th>
+              <th scope="col">Precisión</th>
+              <th scope="col">Padecimiento</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in historial_diagnosticos %}
+            <tr>
+              <td>
+                {% if not p.paciente.foto %}
+                  <img src="{% static 'img/user_default.png' %}" alt="foto del paciente" height="45" style="border-radius: 100%; border:1px solid #7e7e7e;"/>
+                {% else %}
+                  <img src="{{ p.paciente.foto.url }}" alt="foto del paciente" height="45" style="border-radius: 100%; border:1px solid #7e7e7e;"/>
+                {% endif %}
+              </td>
+              <td>{{ p.paciente.primer_nombre|add:" "|add:p.paciente.segundo_nombre }}</td>
+              <td>{{ p.paciente.apellido_paterno|add:" "|add:p.paciente.apellido_materno }}</td>
+              <td>{{ p.precision_value}}%</td>
+              <td>
+                {% if p.padecimiento.name == 'Hernia de Disco' %}
+                  <span class="badge text-bg-danger">Hernia de disco</span>
+                {% elif p.padecimiento.name == 'Espondilolistesis' %}
+                  <span class="badge text-bg-warning">Spondylosis</span>
+                {% else %}
+                  <span class="badge text-bg-success">Normal</span>
+                {% endif %}
+  
+              </td>
+  
+            </tr>
+            {% endfor %}
+  
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  const ctx = document.getElementById("chart_1");
+  const ctx2 = document.getElementById("chart_2");
+  const ctx3 = document.getElementById("chart_3");
+
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["Normal", "Hernia de disco", "Spondylosis"],
+      datasets: [
+        {
+          label: "Patologías de la columna",
+          data: [{{ normal_count }}, {{ hernia_count }}, {{ spon_count }}],
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+    },
+  });
+
+  new Chart(ctx2, {
+    type: "doughnut",
+    data: {
+      labels: ["Normal", "Hernia de disco", "Spondylosis"],
+      datasets: [
+        {
+          label: "Cantidad",
+          data: [{{ normal_count }}, {{ hernia_count }}, {{ spon_count }}],
+          backgroundColor: [
+            "rgb(255, 99, 132)",
+            "rgb(54, 162, 235)",
+            "rgb(255, 205, 86)",
+          ],
+          hoverOffset: 4,
+        },
+      ],
+    },
+    options: {
+      responsive: true, // Habilita la responsividad
+      maintainAspectRatio: false, // Desactiva la relación de aspecto fija
+    },
+  });
+
+
+  const labels = ["Normal", "Hernia de disco", "Spondylosis"];
+
+  // Para Normal
+  let precisionValue = "{{ precision_n.precision_value__avg|floatformat:2 }}";
+  // Reemplazar la coma por un punto y convertir a número flotante
+  precisionValue = parseFloat(precisionValue.replace(',', '.'));
+
+  // Para hernia
+  let precisionValueh = "{{ precision_hernia.precision_value__avg|floatformat:2 }}";
+  // Reemplazar la coma por un punto y convertir a número flotante
+  precisionValueh = parseFloat(precisionValueh.replace(',', '.'));
+
+
+  // Para spon
+  let precisionValues = "{{ precision_spon.precision_value__avg|floatformat:2 }}";
+  // Reemplazar la coma por un punto y convertir a número flotante
+  precisionValues = parseFloat(precisionValues.replace(',', '.'));
+
+
+
+  new Chart(ctx3, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Precisión promedio de las predicciones',
+        data: [precisionValue, precisionValueh, precisionValues],
+        fill: false,
+        backgroundColor: [          
+          'rgba(46, 204, 113, 0.2)',
+          'rgba(255, 99, 132, 0.2)',
+          'rgba(255, 205, 86, 0.2)',
+          'rgba(75, 192, 192, 0.2)',
+          'rgba(54, 162, 235, 0.2)',
+          'rgba(153, 102, 255, 0.2)',
+          'rgba(201, 203, 207, 0.2)'
+        ],
+        borderColor: [          
+          'rgb(35, 155, 86)',
+          'rgb(255, 99, 132)',
+          'rgb(255, 205, 86)',
+          'rgb(75, 192, 192)',
+          'rgb(54, 162, 235)',
+          'rgb(153, 102, 255)',
+          'rgb(201, 203, 207)'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+    }
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,199 @@
+.formularioP{
+    height: 100%;
+}
+
+
+.c_caja {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+
+  .foto {
+    flex: 1;
+    min-width: 250px;
+    min-height: 350px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .imagen {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+
+      img {
+        width: 250px;
+        height: 250px;
+        object-fit: cover;
+        border-radius: 100%;
+        border: 3px solid #000;
+      }
+
+      .custom-file {
+        position: relative;
+        display: inline-block;
+      }
+
+      .custom-file-input {
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0; /* Hace invisible el input */
+        cursor: pointer;
+      }
+
+      .custom-file-label {
+        display: block;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        text-align: center;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        transition: background-color 0.3s;
+      }
+
+      .custom-file-label:hover {
+        background-color: #0056b3;
+      }
+    }
+  }
+
+  .inputs {
+    flex: 2;
+    display: flex;
+    min-width: 250px;
+    flex-direction: column;
+    background-color: #aeb6bf;
+    padding: 2rem;
+    justify-content: center;
+
+    .custom-button {
+        background-color: #333; /* Gris oscuro */
+        color: #fff; /* Blanco para el texto */
+        border: 2px solid #444; /* Bordes ligeramente más claros */
+        border-radius: 8px; /* Bordes redondeados */
+        padding: 10px 20px; /* Espaciado interno */
+        font-size: 16px; /* Tamaño de fuente */
+        font-weight: 500; /* Negrita intermedia */
+        text-transform: uppercase; /* Texto en mayúsculas */
+        cursor: pointer; /* Mano al pasar el cursor */
+        transition: background-color 0.3s, box-shadow 0.3s; /* Animaciones suaves */
+      }
+
+      #id_foto{
+        display: none;
+    }
+      
+      .custom-button:hover {
+        background-color: #444; /* Un poco más claro al pasar el cursor */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra elegante */
+      }
+      
+      .custom-button:active {
+        background-color: #555; /* Más claro al hacer clic */
+        box-shadow: none; /* Sin sombra */
+        transform: translateY(2px); /* Efecto de "presionar" */
+      }
+
+    h1 {
+      height: 50px;
+      color: #fff;
+      font-size: 1.5rem;
+      font-family: "Roboto", sans-serif;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .contenedor_inputs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1rem;
+
+      /* Contenedor del input */
+      .input-container {
+        flex: 1;
+        position: relative;
+        margin: 0px auto;
+        min-width: 200px;
+      }
+
+      /* Estilo base del input */
+      .custom-input {
+        width: 100%;
+        padding: 10px 10px 10px 15px;
+        font-size: 16px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        outline: none;
+        transition: border-color 0.3s, box-shadow 0.3s;
+        background-color: #f9f9f9;
+      }
+
+      /* Efecto al enfocar */
+      .custom-input:focus {
+        border-color: #6200ee;
+        box-shadow: 0 0 5px rgba(98, 0, 238, 0.4);
+      }
+
+      /* Estilo del label */
+      .custom-label {
+        position: absolute;
+        left: 15px;
+        top: 10px;
+        font-size: 16px;
+        color: #aaa;
+        pointer-events: none;
+        transition: all 0.3s ease;
+      }
+
+      input::placeholder {
+        color: transparent;
+    }
+
+    .input-container:has(input[id="id_correo"]) {
+        flex-basis: 100%;
+    }
+
+    label[for="id_usuario_administrador"] {
+      position: relative !important;
+      top: 0;
+      color: #000;
+  }
+
+
+    label[for="id_fecha_creacion"] {
+        display: none;
+    }
+
+    label[for="id_foto"] {
+        display: none;
+    }
+
+    
+
+      /* Animación del label al enfocar o escribir */
+      .custom-input:focus + .custom-label,
+      .custom-input:not(:placeholder-shown) + .custom-label {
+        top: -10px;
+        left: 10px;
+        font-size: 12px;
+        color: #6200ee;
+        background: #f9f9f9;
+        padding: 0 5px;
+        border-radius: 3px;
+      }
+    }
+  }
+}

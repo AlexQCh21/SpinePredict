@@ -1,0 +1,37 @@
+{% extends 'layout/base.html' %} {% load static %} {% block content %}
+
+  <div class="contenedor_modulo container">
+    <div class="title">
+      <h1 class="titulo d-flex align-items-center gap-2">Diagnóstico
+        <i class="bi bi-activity"></i>
+      </h1>
+      <span class="leyenda_d">Herramienta para predecir patologías de la columna vertebral (hernia de disco, espondilosis, normal) mediante análisis de datos y machine learning, mostrando resultados con porcentajes de confianza.</span>
+    </div>
+
+    <div class="contenedor_modulo_t">
+      {% block modulo %} {% endblock %}
+    </div>
+  </div>
+
+<!-- <div class="sketchfab-embed-wrapper d-flex">
+  <iframe
+    style="width: 200px; height: 500px;"
+    title="Human Spine"
+    frameborder="0"
+    allowfullscreen="true"
+    mozallowfullscreen="true"
+    webkitallowfullscreen="true"
+    allow="autoplay; fullscreen; xr-spatial-tracking"
+    xr-spatial-tracking
+    execution-while-out-of-viewport
+    execution-while-not-rendered
+    web-share
+    src="https://sketchfab.com/models/57c71ac4134e40be9506be639a29c9a4/embed"
+  >
+  </iframe>
+  <p style="font-size: 13px; font-weight: normal; margin: 5px; color: #4a4a4a">
+
+  </p> -->
+</div>
+
+{% endblock %}

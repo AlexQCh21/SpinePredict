@@ -1,0 +1,118 @@
+{% extends 'dashboard/diagnostico.html' %} {% load static %} {% block modulo %}
+
+<div class="contenedor_etapa3">
+  <div class="etapa3_header">
+    <h2><b>Etapa 2:</b> Parámetros Radiográficos</h2>
+  </div>
+
+  <form method="get" action="{% url 'diagnosticof' paciente.id %}">
+    <div class="etapa3_contenido">
+      <div class="epata3_parametros">
+        <div class="cont_btn_p">
+          <p>Incidencia pélvica</p>
+          <!-- <input id="ip1" class="contenido" /> -->
+          {{ form.pelvic_incidence }}
+        </div>
+
+        <div class="cont_btn_p">
+          <p>Inclinación pélvica</p>
+          <!-- <input id="ip2" class="contenido" /> -->
+          {{ form.pelvic_tilt }}
+        </div>
+
+        <div class="cont_btn_p">
+          <p>Ángulo de lordosis lumbar</p>
+          <!-- <input id="ip3" class="contenido" /> -->
+          {{ form.lumbar_lordosis_angle }}
+        </div>
+
+        <div class="cont_btn_p">
+          <p>Pendiente sacra</p>
+          <!-- <input id="ip4" class="contenido" /> -->
+          {{ form.sacral_slope }}
+        </div>
+
+        <div class="cont_btn_p">
+          <p>Radio pélvico</p>
+          <!-- <input id="ip5" class="contenido" /> -->
+          {{ form.pelvic_radius }}
+        </div>
+
+        <div class="cont_btn_p">
+          <p>Grado de espondilolistesis</p>
+          <!-- <input id="ip6" class="contenido" /> -->
+          {{ form.degree_spondylolisthesis }}
+        </div>
+      </div>
+
+      <div class="imagen_referencia">
+        <img id="img_p" src="{% static 'img/columna.png' %}" alt="" />
+      </div>
+
+      <div class="paciente_evento">
+        <div class="foto_paciente">
+          <div class="imagen_paciente">
+            {% if not paciente.foto %}
+              <img src="{% static 'img/user_default.png' %}" alt="foto del paciente" />
+            {% else %}
+              <img src="{{ paciente.foto.url }}" alt="foto del paciente" />
+            {% endif %}
+          </div>
+          <p>
+            <b>{{ paciente.primer_nombre|add:" "|add:paciente.apellido_paterno }}</b>
+          </p>
+        </div>
+
+        <div class="btns">
+          <a
+            href="{% url 'diagnostico' %}"
+            id="cancelar"
+            class="btn btn-outline-danger"
+            >Cancelar <i class="bi bi-x-octagon"></i
+          ></a>
+          <button
+            type="submit"
+            id="seguir"
+            class="btn btn-outline-secondary"
+            >Diagnosticar <i class="bi bi-clipboard2-pulse-fill"></i
+          ></button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  let img = document.getElementById("img_p");
+  const iparametro1 = document.getElementById("id_pelvic_incidence");
+  const iparametro2 = document.getElementById("id_pelvic_tilt");
+  const iparametro3 = document.getElementById("id_lumbar_lordosis_angle");
+  const iparametro4 = document.getElementById("id_sacral_slope");
+  const iparametro5 = document.getElementById("id_pelvic_radius");
+  const iparametro6 = document.getElementById("id_degree_spondylolisthesis");
+
+  iparametro1.addEventListener("focus", () => {
+    img.src = "{% static 'img/incidencia_pelvica.png' %}";
+  });
+
+  iparametro2.addEventListener("focus", () => {
+    img.src = "{% static 'img/inclinacion_pelvica.png' %}";
+  });
+
+  iparametro3.addEventListener("focus", () => {
+    img.src = "{% static 'img/angulo_lordosis.jpg' %}";
+  });
+
+  iparametro4.addEventListener("focus", () => {
+    img.src = "{% static 'img/pendiente_sacra.jpg' %}";
+  });
+
+  iparametro5.addEventListener("focus", () => {
+    img.src = "{% static 'img/radio_pelvico.jpg' %}";
+  });
+
+  iparametro6.addEventListener("focus", () => {
+    img.src = "{% static 'img/grado_espon.jpg' %}";
+  });
+</script>
+{% endblock %}

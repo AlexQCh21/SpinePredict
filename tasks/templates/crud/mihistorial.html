@@ -1,0 +1,67 @@
+{% extends 'crud/basecrud.html' %}
+{% load static %} 
+{% block icon_crud %}
+<i class="bi bi-person-badge"></i>
+{% endblock %}
+
+{% block descripcion %}
+El sistema permite la visualización de los diagnosticos realizados.
+{% endblock %}
+
+{% block crud_mod %}
+<div class="contenedor_tabla container container_disigne">
+    <div class="table_header pt-3 pl-0">
+
+        <div class="input_search">
+            <input type="search" name="" id="btn_buscar_p" placeholder="Buscar paciente">
+            <i class="bi bi-search" id="search"></i>
+        </div>
+    </div>
+    <div class="table_paciente">
+        <table id="tbl">
+            <caption>Mi historial de diagnósticos</caption>
+            <thead>
+                <tr>
+                    <th># <i class="bi bi-chevron-contract"></i></th>
+                    <th>Nombres <i class="bi bi-chevron-contract"></i></th>
+                    <th>Apellidos <i class="bi bi-chevron-contract"></i></th>
+                    <th>Confianza <i class="bi bi-chevron-contract"></i></th>
+                    <th>Predicción <i class="bi bi-chevron-contract"></i></th>
+                </tr>
+            </thead>
+                
+            <tbody>
+                {% for p in historial %}
+                <tr>
+                    <td>
+                        {% if not p.paciente.foto %}
+                        <img src="{% static 'img/user_default.png' %}" alt="foto del paciente" height="45" style="border-radius: 100%; border:1px solid #7e7e7e;"/>
+                        {% else %}
+                        <img src="{{ p.paciente.foto.url }}" alt="foto del paciente" height="45" style="border-radius: 100%; border:1px solid #7e7e7e;"/>
+                        {% endif %}
+                    </td>
+                    <td>{{ p.paciente.primer_nombre|add:" "|add:p.paciente.segundo_nombre }}</td>
+                    <td>{{ p.paciente.apellido_paterno|add:" "|add:p.paciente.apellido_materno }}</td>
+                    <td>{{ p.precision_value}}%</td>
+                    <td>
+                        {% if p.padecimiento.name == 'Hernia de Disco' %}
+                        <span class="badge text-bg-danger">Hernia de disco</span>
+                        {% elif p.padecimiento.name == 'Espondilolistesis' %}
+                        <span class="badge text-bg-warning">Spondylosis</span>
+                        {% else %}
+                        <span class="badge text-bg-success">Normal</span>
+                        {% endif %}
+        
+                    </td>
+        
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="table_fotter">
+        <p><i><b>Total de registros: {{ cantidad }}</b></i></p>
+    </div>
+</div>
+<script src="{% static 'js/jsTabla/index.js' %}"></script>
+{% endblock %}

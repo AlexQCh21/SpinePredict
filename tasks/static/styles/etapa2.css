@@ -1,0 +1,170 @@
+.contenedor_etapa2 {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+
+  background-color: #fff;
+  border-radius: 40px;
+  padding: 1rem;
+  border: 2px solid #dedede;
+  box-shadow: 7px 8px 13px -4px rgba(0, 0, 0, 0.2);
+}
+
+.etapa2_header {
+  min-height: 40px;
+  font-family: "Roboto", sans-serif;
+}
+
+.etapa2_header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: "Inter", serif;
+  color: #545454;
+
+  text-align: center;
+}
+
+.etapa2_form {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  /* background-color: #ffffff; */
+  /* border-radius: 40px; */
+  height: 100%;
+  /* -webkit-box-shadow: 7px 8px 13px -4px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 7px 8px 13px -4px rgba(0, 0, 0, 0.75);
+  box-shadow: 7px 8px 13px -4px rgba(0, 0, 0, 0.2); */
+  /* border: 2px solid #dedede; */
+}
+
+.foto_paciente {
+  flex: 1;
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.foto_paciente .imagen {
+  width: 90%;
+  overflow: hidden;
+  text-align: center;
+  max-width: 300px;
+}
+
+.foto_paciente img {
+  height: auto;
+  width: 100%;
+  object-fit: contain;
+  object-position: bottom;
+  /* max-height: 250px; */
+  mask-image: linear-gradient(black 90%, transparent);
+}
+
+.datos_paciente {
+  flex: 2;
+  grid-column: span 2;
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.datos_paciente .datos {
+  /* display: grid;
+    grid-template-rows: auto;
+    grid-template-columns: repeat(auto-fill, minmax(250px,1fr));
+    gap: 1rem; */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.facture {
+  /* grid-column: span 2; */
+  flex-basis: 100% !important;
+}
+
+.datos_paciente .datos .cont_btn_p {
+  width: 100%;
+  min-width: 250px;
+  height: 50px;
+  flex: 1;
+  position: relative;
+  background-color: #ffffff;
+  border-top-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border: 2px solid #acacacb9;
+
+  p {
+    position: absolute;
+    top: 0.2rem;
+    left: 1rem;
+    color: #000;
+    font-size: 0.85rem;
+    margin: 0;
+    font-weight: 800;
+  }
+
+  .contenido {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    z-index: 5;
+    padding-top: 1.3rem;
+    padding-left: 1rem;
+    color: #000;
+  }
+}
+
+.datos_paciente .botones {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 1rem 0;
+  gap: 1rem;
+}
+
+.datos_paciente .botones a {
+  text-align: center;
+  min-width: 170px;
+}
+
+.datos_paciente .botones .btn_cerrar {
+  flex: 1;
+  text-decoration: none;
+  color: #ffffff;
+  padding: 0.5rem 2rem;
+  border-radius: 10px;
+  background-color: #000000;
+  transition: all 0.5s ease;
+  border: 3px solid #000000;
+}
+
+.datos_paciente .botones .btn_siguiente {
+  flex: 1;
+  text-decoration: none;
+  color: #000;
+  padding: 0.5rem 2rem;
+  border-radius: 10px;
+  border: 3px solid #000000;
+  transition: all 0.5s ease;
+}
+
+.datos_paciente .botones .btn_siguiente:hover {
+  background-color: #000000;
+  color: #ffffff;
+  transition: all 0.5s ease;
+}
+
+.datos_paciente .botones .btn_cerrar:hover {
+  background-color: #ffffff;
+  color: #000000;
+  transition: all 0.5s ease;
+  border: 3px solid #000000;
+}

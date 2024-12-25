@@ -1,0 +1,50 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+
+{% block content %}
+<form action="" method="POST" class="formularioP" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="container c_caja">
+        <div class="foto">
+            <div class="imagen">
+                <img src="{% static 'img/user_default.png' %}" alt="" id="img_rp">
+                <label for="{{ form.foto.id_for_label  }}" class="custom-file-label">Seleccionar archivos</label>
+                <!-- <input type="file" id="file-input" class="custom-file-input" accept="image/*"> -->
+                {{ form.foto }}
+            </div>
+
+            
+        </div>
+
+        <div class="inputs">
+            <h1>Registrar un {{ tipo_usuario }}</h1>
+            <div class="contenedor_inputs">
+                <!-- <div class="input-container">
+                    <input type="text" id="text-input" class="custom-input" placeholder=" ">
+                    <label for="text-input" class="custom-label">Primer nombre</label>
+                </div> -->
+
+                {% for field in form %}
+                    <div class="input-container">
+                    {{ field }}
+                    <label for="{{ field.id_for_label }}" class="custom-label">{{ field.label }}</label>
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="submit" class="custom-button">{{ texto_boton }}</button>
+        </div>
+    </div>
+</form>
+<script>
+    const img = document.getElementById('img_rp');
+    const input = document.getElementById('id_foto');
+
+    input.addEventListener('change',()=>{
+        img.src = URL.createObjectURL(input.files[0]);
+    });
+</script>
+
+
+
+{% endblock %}
+
