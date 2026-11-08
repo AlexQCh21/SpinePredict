@@ -1,0 +1,136 @@
+{% load static %}
+<section class="panel">
+  <div class="panel__header table-toolbar">
+    <form method="get" role="search" class="table-toolbar__search">
+      <i class="bi bi-search" aria-hidden="true"></i>
+      <label class="visually-hidden" for="btn_buscar_p">Buscar diagnóstico</label>
+      <input
+        type="search"
+        id="btn_buscar_p"
+        name="q"
+        value="{{ q }}"
+        placeholder="Buscar por paciente, DNI o diagnóstico"
+        autocomplete="off"
+      />
+      {% if origen %}
+        <input type="hidden" name="origen" value="{{ origen }}" />
+      {% endif %}
+    </form>
+  </div>
+
+  <div class="table-scroll">
+    <table class="table-app table-app--cards" id="tbl">
+      <caption>{{ caption }}</caption>
+      <thead>
+        <tr>
+          <th>Paciente</th>
+          <th>Fecha</th>
+          <th>Confianza</th>
+          <th>Predicción</th>
+          <th class="table-actions">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in historial %}
+          <tr
+            data-search="{{ p.paciente.primer_nombre }} {{ p.paciente.segundo_nombre }} {{ p.paciente.apellido_paterno }} {{ p.paciente.apellido_materno }} {{ p.paciente.dni }} {{ p.padecimiento.name }}"
+          >
+            <td>
+              <div class="cell-patient">
+                <span class="avatar-cell">
+                  {% if p.paciente.foto %}
+                    <img src="{{ p.paciente.foto.url }}" alt="" loading="lazy" />
+                  {% else %}
+                    <img
+                      src="{% static 'img/user_default.png' %}"
+                      alt=""
+                      loading="lazy"
+                    />
+                  {% endif %}
+                </span>
+                <span class="cell-patient__body">
+                  <span class="cell-patient__name">
+                    {{ p.paciente.primer_nombre }} {{ p.paciente.segundo_nombre }}
+                    {{ p.paciente.apellido_paterno }}
+                    {{ p.paciente.apellido_materno }}
+                  </span>
+                  <span class="cell-patient__sub">
+                    DNI {{ p.paciente.dni }}
+                  </span>
+                </span>
+              </div>
+            </td>
+            <td class="cell-muted" data-label="Fecha">
+              {{ p.fecha|date:"d/m/Y H:i" }}
+            </td>
+            <td class="tabular" data-label="Confianza">
+              {{ p.precision_value|floatformat:1 }}%
+            </td>
+            <td data-label="Predicción">
+              {% if p.padecimiento.name == 'Hernia de Disco' %}
+                <span class="badge-status badge-status--danger">
+                  Hernia de disco
+                </span>
+              {% elif p.padecimiento.name == 'Espondilolistesis' %}
+                <span class="badge-status badge-status--warn">
+                  Espondilolistesis
+                </span>
+              {% else %}
+                <span class="badge-status badge-status--ok">Normal</span>
+              {% endif %}
+            </td>
+            <td class="table-actions">
+              <a
+                href="{% url 'diagnostico_detalle' p.id %}{% if origen %}?origen={{ origen }}{% endif %}"
+                class="icon-btn"
+                title="Ver detalle del diagnóstico"
+                aria-label="Ver detalle del diagnóstico de {{ p.paciente.primer_nombre }} {{ p.paciente.apellido_paterno }}"
+              >
+                <i class="bi bi-eye" aria-hidden="true"></i>
+              </a>
+              <a
+                href="{% url 'diagnostico_pdf' p.id %}"
+                class="icon-btn"
+                target="_blank"
+                rel="noopener"
+                title="Ver informe PDF"
+                aria-label="Ver informe PDF del diagnóstico de {{ p.paciente.primer_nombre }} {{ p.paciente.apellido_paterno }}"
+              >
+                <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>
+              </a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5">
+              <div class="empty-state">
+                <div class="empty-state__icon">
+                  <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i>
+                </div>
+                <p class="empty-state__title">Aún no hay diagnósticos</p>
+                <p class="empty-state__text">
+                  Los diagnósticos realizados aparecerán en este historial.
+                </p>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-footer">
+    <span>
+      {% if q %}
+        Resultados para “{{ q }}”: {{ cantidad }}
+      {% else %}
+        Total de diagnósticos: {{ cantidad }}
+      {% endif %}
+    </span>
+    <span class="table-footer__hint">
+      Ordenados del más reciente al más antiguo
+    </span>
+  </div>
+
+  {% include 'crud/_paginacion.html' %}
+</section>

@@ -1,76 +1,109 @@
-{% extends 'dashboard/diagnostico.html' %} {% load static %} {% block modulo %}
+{% extends 'dashboard/diagnostico.html' %} {% load static %} {% block paso %}{% include 'dashboard/modulos/_stepper.html' with paso=2 %}{% endblock %} {% block modulo %}
 
-<!-- {{ paciente.primer_nombre }} -->
-<div class="contenedor_etapa2">
-  <div class="etapa2_header">
-    <h2>
-      <b>Etapa 1:</b> Detalle del Paciente {{ paciente.primer_nombre|add:" "|add:paciente.apellido_paterno}}
-    </h2>
+<section class="panel patient-panel">
+  <div class="panel__header">
+    <div>
+      <h2 class="panel__title">
+        <i class="bi bi-person-vcard" aria-hidden="true"></i>
+        Ficha del paciente
+      </h2>
+      <p class="panel__hint">Verifica los datos antes de continuar.</p>
+    </div>
+    <span class="badge-status badge-status--ok">Activo</span>
   </div>
 
-  <div class="etapa2_form">
-    <div class="foto_paciente">
-      <div class="imagen">
+  <div class="patient-panel__body">
+    <aside class="patient-identity">
+      <div class="patient-identity__photo">
         {% if not paciente.foto %}
-          <img src="{% static 'img/user_default.png' %}" alt="foto del paciente" />
+          <img
+            src="{% static 'img/user_default.png' %}"
+            alt="Fotografía de {{ paciente.primer_nombre }} {{ paciente.apellido_paterno }}"
+            loading="lazy"
+          />
         {% else %}
-          <img src="{{ paciente.foto.url }}" alt="foto del paciente" />
+          <img
+            src="{{ paciente.foto.url }}"
+            alt="Fotografía de {{ paciente.primer_nombre }} {{ paciente.apellido_paterno }}"
+            loading="lazy"
+          />
         {% endif %}
-        
       </div>
-      <div class="paciente_nombre">
-        {{ paciente.primer_nombre|add:" "|add:paciente.apellido_paterno}}
+      <p class="patient-identity__name">
+        {{ paciente.primer_nombre }} {{ paciente.apellido_paterno }}
+      </p>
+      <p class="patient-identity__dni">DNI {{ paciente.dni }}</p>
+      <p class="patient-identity__since">
+        Registrado el {{ paciente.fecha_creacion|date:"d/m/Y" }}
+      </p>
+    </aside>
+
+    <dl class="record-grid">
+      <div class="record">
+        <dt>Primer nombre</dt>
+        <dd>{{ paciente.primer_nombre }}</dd>
       </div>
-    </div>
-    <div class="datos_paciente">
-      <div class="datos">
-        <div class="cont_btn_p">
-          <p>Primer nombre</p>
-          <div class="contenido">{{ paciente.primer_nombre }}</div>
-        </div>
-
-        <div class="cont_btn_p">
-          <p>Segundo nombre</p>
-          <div class="contenido">{{ paciente.segundo_nombre }}</div>
-        </div>
-
-        <div class="cont_btn_p">
-          <p>Apellido paterno</p>
-          <div class="contenido">{{ paciente.apellido_paterno }}</div>
-        </div>
-
-        <div class="cont_btn_p">
-          <p>Apellido materno</p>
-          <div class="contenido">{{ paciente.apellido_materno }}</div>
-        </div>
-
-        <div class="cont_btn_p facture">
-          <p>Correo electrónico</p>
-          <div class="contenido">{{ paciente.correo }}</div>
-        </div>
-
-        <div class="cont_btn_p">
-          <p>Dni</p>
-          <div class="contenido">{{ paciente.dni }}</div>
-        </div>
-
-        <div class="cont_btn_p">
-          <p>Teléfono</p>
-          <div class="contenido">{{ paciente.telefono }}</div>
-        </div>
+      <div class="record">
+        <dt>Segundo nombre</dt>
+        <dd>
+          {% if paciente.segundo_nombre %}
+            {{ paciente.segundo_nombre }}
+          {% else %}
+            <span class="text-muted">No registrado</span>
+          {% endif %}
+        </dd>
       </div>
-      <div class="botones">
-        <a href="{% url 'diagnostico' %}" class="btn_cerrar">
-          <i class="bi bi-box-arrow-in-left"></i>
-          Regresar
-        </a>
-        <a href="{% url 'diagnostico3' paciente.id %}" class="btn_siguiente">
-          Siguiente
-          <i class="bi bi-box-arrow-in-right"></i>
-        </a>
+      <div class="record">
+        <dt>Apellido paterno</dt>
+        <dd>{{ paciente.apellido_paterno }}</dd>
       </div>
-    </div>
+      <div class="record">
+        <dt>Apellido materno</dt>
+        <dd>
+          {% if paciente.apellido_materno %}
+            {{ paciente.apellido_materno }}
+          {% else %}
+            <span class="text-muted">No registrado</span>
+          {% endif %}
+        </dd>
+      </div>
+      <div class="record">
+        <dt>Documento de identidad</dt>
+        <dd class="tabular">{{ paciente.dni }}</dd>
+      </div>
+      <div class="record">
+        <dt>Teléfono</dt>
+        <dd>
+          {% if paciente.telefono %}
+            {{ paciente.telefono }}
+          {% else %}
+            <span class="text-muted">No registrado</span>
+          {% endif %}
+        </dd>
+      </div>
+      <div class="record record--wide">
+        <dt>Correo electrónico</dt>
+        <dd>
+          {% if paciente.correo %}
+            {{ paciente.correo }}
+          {% else %}
+            <span class="text-muted">No registrado</span>
+          {% endif %}
+        </dd>
+      </div>
+    </dl>
   </div>
-</div>
+
+  <div class="module-actions">
+    <a href="{% url 'diagnostico' %}" class="btn-app btn-app--ghost">
+      <i class="bi bi-arrow-left" aria-hidden="true"></i>
+      Volver
+    </a>
+    <a href="{% url 'diagnostico3' paciente.id %}" class="btn-app btn-app--primary">
+      Continuar a parámetros
+      <i class="bi bi-arrow-right" aria-hidden="true"></i>
+    </a>
+  </div>
+</section>
 
 {% endblock %}

@@ -1,0 +1,65 @@
+# docker-compose.yml
+# Docker Compose lee automáticamente `.env` para interpolar ${VAR}.
+# Las variables declaradas aquí son las que se inyectan a los contenedores.
+# No se usa env_file: el compose es la fuente explícita de variables requeridas.
+
+x-app-environment: &app-environment
+  # Django (requeridas)
+  DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?DJANGO_SECRET_KEY es requerido}
+  DJANGO_DEBUG: ${DJANGO_DEBUG:-0}
+  DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+  DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-}
+
+  # Base de datos Supabase Postgres (requerida)
+  DATABASE_URL: ${DATABASE_URL:?DATABASE_URL es requerido}
+  DB_CONN_MAX_AGE: ${DB_CONN_MAX_AGE:-60}
+  DB_SSL_REQUIRE: ${DB_SSL_REQUIRE:-0}
+  DB_DISABLE_SERVER_SIDE_CURSORS: ${DB_DISABLE_SERVER_SIDE_CURSORS:-0}
+
+  # Supabase Storage S3 compatible, bucket privado (opcional: sin bucket usa media local)
+  SUPABASE_S3_ENDPOINT: ${SUPABASE_S3_ENDPOINT:-}
+  SUPABASE_S3_REGION: ${SUPABASE_S3_REGION:-us-east-1}
+  SUPABASE_S3_ACCESS_KEY_ID: ${SUPABASE_S3_ACCESS_KEY_ID:-}
+  SUPABASE_S3_SECRET_ACCESS_KEY: ${SUPABASE_S3_SECRET_ACCESS_KEY:-}
+  SUPABASE_S3_BUCKET: ${SUPABASE_S3_BUCKET:-}
+  SUPABASE_MEDIA_EXPIRE: ${SUPABASE_MEDIA_EXPIRE:-3600}
+
+  # Modo demo compartido
+  DEMO_MODE: ${DEMO_MODE:-1}
+  DEMO_CLEANUP_INTERVAL_SECONDS: ${DEMO_CLEANUP_INTERVAL_SECONDS:-3600}
+  DEMO_ADMIN_USERNAME: ${DEMO_ADMIN_USERNAME:-demo_admin}
+  DEMO_ADMIN_PASSWORD: ${DEMO_ADMIN_PASSWORD:-Admin12345}
+  DEMO_SPECIALIST_USERNAME: ${DEMO_SPECIALIST_USERNAME:-demo_especialista}
+  DEMO_SPECIALIST_PASSWORD: ${DEMO_SPECIALIST_PASSWORD:-Especialista12345}
+
+  # Gunicorn
+  GUNICORN_WORKERS: ${GUNICORN_WORKERS:-2}
+  GUNICORN_TIMEOUT: ${GUNICORN_TIMEOUT:-120}
+
+services:
+  web:
+    build: .
+    container_name: spinepredict-web
+    environment: *app-environment
+    ports:
+      - "8000:8000"
+    command: ["web"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/healthz/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  cleanup:
+    build: .
+    container_name: spinepredict-cleanup
+    environment: *app-environment
+    command: ["cleanup"]
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_healthy
+    profiles:
+      - demo

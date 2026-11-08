@@ -1,0 +1,10 @@
+{% extends "errors/base_error.html" %}
+
+{% block title %}Sesión expirada{% endblock %}
+{% block error_code %}Error 403{% endblock %}
+{% block error_icon_class %}error-card__icon--warn{% endblock %}
+{% block error_icon %}bi-hourglass-split{% endblock %}
+{% block error_heading %}Sesión expirada{% endblock %}
+{% block error_text %}
+  La verificación de seguridad del formulario falló o la página estuvo abierta demasiado tiempo. Vuelve a iniciar sesión e inténtalo de nuevo.
+{% endblock %}

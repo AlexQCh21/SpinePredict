@@ -1,54 +1,100 @@
-{% extends 'dashboard/diagnostico.html' %}
-{% load static %} 
-{% block modulo %}
-    <div class="contenedor_tabla container container_disigne">
-        <div class="table_header">
-            <!-- <h2>Pacientes</h2> -->
-            <a href="{% url 'registro_p' %}">
-                <button>Registrar paciente</button>
-            </a>
-            <!-- <select name="" id="">
-                <option value="" selected>Tipo</option>
-            </select> -->
+{% extends 'dashboard/diagnostico.html' %} {% load static %} {% block paso %}{% include 'dashboard/modulos/_stepper.html' with paso=1 %}{% endblock %} {% block modulo %}
 
-            <div class="input_search">
-                <input type="search" name="" id="btn_buscar_p" placeholder="Buscar paciente">
-                <i class="bi bi-search" id="search"></i>
-            </div>
-        </div>
-        <div class="table_paciente">
-            <table id="tbl">
-                <caption>Pacientes registrados</caption>
-                <thead>
-                    <tr>
-                        <th># <i class="bi bi-chevron-contract"></i></th>
-                        <th>Nombres <i class="bi bi-chevron-contract"></i></th>
-                        <th>Apellidos <i class="bi bi-chevron-contract"></i></th>
-                        <th>Documento de identidad <i class="bi bi-chevron-contract"></i></th>
-                        <th>Evento <i class="bi bi-chevron-contract"></i></th>
-                    </tr>
-                </thead>
-                    
-                <tbody>
-                    {% for p in pacientes %}
-                    <tr>
-                        <td>{{ p.id }}</td>
-                        <td>{{ p.primer_nombre|add:" "|add:p.segundo_nombre }}</td>
-                        <td>{{ p.apellido_paterno|add:" "|add:p.apellido_materno }}</td>
-                        <td>{{ p.dni }}</td>
-                        <td>
-                            <a href="{% url 'diagnostico2' p.id %}" class="btn bg-transparent"><i class="bi bi-clipboard-pulse" id="icons"></i></a>
-                            <!-- <button><i class="bi bi-pencil-square" id="icons"></i></button> -->
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="table_fotter">
-            <p><i><b>Total de pacientes: {{ cantidad }}</b></i></p>
-        </div>
-    </div>
+<section class="panel">
+  <div class="panel__header table-toolbar">
+    <form
+      method="get"
+      role="search"
+      action="{% url 'diagnostico' %}"
+      class="table-toolbar__search"
+    >
+      <i class="bi bi-search" aria-hidden="true"></i>
+      <label class="visually-hidden" for="btn_buscar_p">Buscar paciente</label>
+      <input
+        type="search"
+        id="btn_buscar_p"
+        name="q"
+        value="{{ q }}"
+        placeholder="Buscar por nombre o DNI"
+        autocomplete="off"
+      />
+    </form>
+    <a href="{% url 'registro_p' %}" class="btn-app btn-app--primary">
+      <i class="bi bi-plus-lg" aria-hidden="true"></i>
+      Registrar paciente
+    </a>
+  </div>
 
-    <script src="{% static 'js/jsTabla/index.js' %}"></script>
+  <div class="table-scroll">
+    <table class="table-app table-app--cards" id="tbl">
+      <caption>Pacientes registrados</caption>
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Nombres</th>
+          <th scope="col">Apellidos</th>
+          <th scope="col">Documento de identidad</th>
+          <th scope="col" class="table-actions">Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in pacientes %}
+          <tr
+            data-search="{{ p.primer_nombre }} {{ p.segundo_nombre }} {{ p.apellido_paterno }} {{ p.apellido_materno }} {{ p.dni }}"
+          >
+            <td class="cell-strong col-id">{{ p.id }}</td>
+            <td class="cell-name">
+              {{ p.primer_nombre|add:" "|add:p.segundo_nombre }}
+            </td>
+            <td class="col-apellidos">
+              {{ p.apellido_paterno|add:" "|add:p.apellido_materno }}
+            </td>
+            <td class="tabular col-dni" data-label="Documento">{{ p.dni }}</td>
+            <td class="table-actions">
+              <a
+                href="{% url 'diagnostico2' p.id %}"
+                class="btn-app btn-app--secondary btn-app--sm"
+              >
+                <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i>
+                Evaluar
+              </a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5">
+              <div class="empty-state">
+                <div class="empty-state__icon">
+                  <i class="bi bi-person-plus" aria-hidden="true"></i>
+                </div>
+                <p class="empty-state__title">Todavía no hay pacientes</p>
+                <p class="empty-state__text">
+                  Registra al primer paciente para iniciar una evaluación
+                  radiográfica.
+                </p>
+                <a href="{% url 'registro_p' %}" class="btn-app btn-app--primary btn-app--sm">
+                  Registrar paciente
+                </a>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-footer">
+    <span>
+      {% if q %}
+        Resultados para “{{ q }}”: {{ cantidad }}
+      {% else %}
+        Total de pacientes: {{ cantidad }}
+      {% endif %}
+    </span>
+    <span class="table-footer__hint">Selecciona un paciente para continuar</span>
+  </div>
+
+  {% include 'crud/_paginacion.html' %}
+</section>
+
 {% endblock %}

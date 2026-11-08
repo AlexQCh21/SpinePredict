@@ -1,0 +1,10 @@
+{% extends "errors/base_error.html" %}
+
+{% block title %}Error interno{% endblock %}
+{% block error_code %}Error 500{% endblock %}
+{% block error_icon_class %}error-card__icon--danger{% endblock %}
+{% block error_icon %}bi-exclamation-octagon{% endblock %}
+{% block error_heading %}Error interno del servidor{% endblock %}
+{% block error_text %}
+  Ocurrió un problema inesperado al procesar tu solicitud. Inténtalo nuevamente en unos momentos; si el problema continúa, contacta al administrador del sistema.
+{% endblock %}

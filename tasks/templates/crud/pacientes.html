@@ -1,61 +1,195 @@
-{% extends 'crud/basecrud.html' %}
-{% load static %} 
-{% block icon_crud %}
-<i class="bi bi-person-badge"></i>
-{% endblock %}
+{% extends 'crud/basecrud.html' %} {% load static %} {% block page_title %}Pacientes{% endblock %} {% block icon_crud %}<i class="bi bi-person-heart" aria-hidden="true"></i>{% endblock %} {% block descripcion %} Consulta las fichas de los pacientes, administra sus datos y revisa los registros inactivos. {% endblock %} {% block crud_mod %}
 
-{% block descripcion %}
-El sistema permite gestionar los registros de pacientes, facilitando la creación, visualización y eliminación de sus datos médicos de manera rápida y segura.
-{% endblock %}
-
-{% block crud_mod %}
-<div class="contenedor_tabla container container_disigne">
-    <div class="table_header pt-3 pl-0">
-        <a href="{% url 'registro_p' %}">
-            <button>Registrar paciente</button>
+<section class="panel">
+  <div class="panel__header table-toolbar">
+    <form
+      method="get"
+      role="search"
+      action="{% url 'paciente' %}"
+      class="table-toolbar__search"
+    >
+      <i class="bi bi-search" aria-hidden="true"></i>
+      <label class="visually-hidden" for="btn_buscar_p">Buscar paciente</label>
+      <input
+        type="search"
+        id="btn_buscar_p"
+        name="q"
+        value="{{ q }}"
+        placeholder="Buscar por nombre, DNI o correo"
+        autocomplete="off"
+      />
+      {% if mostrar_inactivos %}
+        <input type="hidden" name="inactivos" value="1" />
+      {% endif %}
+    </form>
+    <div class="page-header__actions">
+      <a
+        href="{% url 'paciente' %}{% if not mostrar_inactivos %}?inactivos=1{% endif %}"
+        class="btn-app btn-app--secondary"
+      >
+        <i class="bi {% if mostrar_inactivos %}bi-person-check{% else %}bi-person-dash{% endif %}" aria-hidden="true"></i>
+        {% if mostrar_inactivos %}
+          Ver activos
+        {% else %}
+          Ver inactivos ({{ cantidad_inactivos }})
+        {% endif %}
+      </a>
+      {% if not request.user.usuario_administrador %}
+        <a href="{% url 'registro_p' %}" class="btn-app btn-app--primary">
+          <i class="bi bi-plus-lg" aria-hidden="true"></i>
+          Registrar paciente
         </a>
-        <div class="input_search">
-            <input type="search" name="" id="btn_buscar_p" placeholder="Buscar paciente">
-            <i class="bi bi-search" id="search"></i>
-        </div>
+      {% endif %}
     </div>
-    <div class="table_paciente">
-        <table id="tbl">
-            <caption>Pacientes registrados</caption>
-            <thead>
-                <tr>
-                    <th># <i class="bi bi-chevron-contract"></i></th>
-                    <th>Nombres <i class="bi bi-chevron-contract"></i></th>
-                    <th>Apellidos <i class="bi bi-chevron-contract"></i></th>
-                    <th>Documento de identidad <i class="bi bi-chevron-contract"></i></th>
-                    <th>Evento <i class="bi bi-chevron-contract"></i></th>
-                </tr>
-            </thead>
-                
-            <tbody>
-                {% for p in object_list %}
-                <tr>
-                    <td>{{ p.id }}</td>
-                    <td>{{ p.primer_nombre|add:" "|add:p.segundo_nombre }}</td>
-                    <td>{{ p.apellido_paterno|add:" "|add:p.apellido_materno }}</td>
-                    <td>{{ p.dni }}</td>
-                    <td class="d-flex">
-                        <!-- <a href="#" class="btn bg-transparent text-primary"><i class="bi bi-pencil-square"></i></a> -->
-                        <!-- <a href="#" class="btn bg-transparent text-danger"><i class="bi bi-trash-fill"></i></a> -->
-                        <!-- <button><i class="bi bi-pencil-square" id="icons"></i></button> -->
-                        <form action="{% url 'desactivar_paciente' p.id %}" method="POST">
-                            {% csrf_token %}
-                            <button class="btn bg-transparent text-danger" type="submit"><i class="bi bi-trash-fill"></i></button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="table_fotter">
-        <p><i><b>Total de pacientes: {{ cantidad }}</b></i></p>
-    </div>
-</div>
-<script src="{% static 'js/jsTabla/index.js' %}"></script>
+  </div>
+
+  <div class="table-scroll">
+    <table class="table-app table-app--cards" id="tbl">
+      <caption>
+        {% if mostrar_inactivos %}Pacientes inactivos{% else %}Pacientes activos{% endif %}
+      </caption>
+      <thead>
+        <tr>
+          <th class="col-id">#</th>
+          <th>Paciente</th>
+          <th>Documento</th>
+          <th>Estado</th>
+          <th>Registrado</th>
+          <th class="table-actions">Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in object_list %}
+          <tr
+            data-search="{{ p.primer_nombre }} {{ p.segundo_nombre }} {{ p.apellido_paterno }} {{ p.apellido_materno }} {{ p.dni }}"
+          >
+            <td class="col-id">{{ p.id }}</td>
+            <td>
+              <a class="cell-patient" href="{% url 'paciente_detalle' p.id %}">
+                <span class="avatar-cell">
+                  {% if p.foto %}
+                    <img src="{{ p.foto.url }}" alt="" loading="lazy" />
+                  {% else %}
+                    <img
+                      src="{% static 'img/user_default.png' %}"
+                      alt=""
+                      loading="lazy"
+                    />
+                  {% endif %}
+                </span>
+                <span class="cell-patient__body">
+                  <span class="cell-patient__name">
+                    {{ p.primer_nombre }} {{ p.segundo_nombre }}
+                    {{ p.apellido_paterno }} {{ p.apellido_materno }}
+                  </span>
+                  <span class="cell-patient__sub">
+                    {% if p.correo %}{{ p.correo }}{% else %}Sin correo registrado{% endif %}
+                  </span>
+                </span>
+              </a>
+            </td>
+            <td class="tabular" data-label="Documento">{{ p.dni }}</td>
+            <td data-label="Estado">
+              {% if p.activo %}
+                <span class="badge-status badge-status--ok">Activo</span>
+              {% else %}
+                <span class="badge-status badge-status--danger">Inactivo</span>
+              {% endif %}
+            </td>
+            <td class="cell-muted" data-label="Registrado">
+              {{ p.fecha_creacion|date:"d/m/Y" }}
+            </td>
+            <td class="table-actions">
+              <a
+                href="{% url 'paciente_detalle' p.id %}"
+                class="icon-btn"
+                title="Ver ficha"
+                aria-label="Ver ficha de {{ p.primer_nombre }} {{ p.apellido_paterno }}"
+              >
+                <i class="bi bi-eye" aria-hidden="true"></i>
+              </a>
+              {% if not request.user.usuario_administrador and p.activo %}
+                <a
+                  href="{% url 'paciente_editar' p.id %}"
+                  class="icon-btn"
+                  title="Editar paciente"
+                  aria-label="Editar a {{ p.primer_nombre }} {{ p.apellido_paterno }}"
+                >
+                  <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                </a>
+                <form
+                  action="{% url 'desactivar_paciente' p.id %}"
+                  method="post"
+                  data-confirm="¿Desactivar a {{ p.primer_nombre }} {{ p.apellido_paterno }}? El registro dejará de aparecer en el listado activo."
+                >
+                  {% csrf_token %}
+                  <button
+                    type="submit"
+                    class="icon-btn icon-btn--danger"
+                    title="Desactivar paciente"
+                    aria-label="Desactivar a {{ p.primer_nombre }} {{ p.apellido_paterno }}"
+                  >
+                    <i class="bi bi-person-x" aria-hidden="true"></i>
+                  </button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6">
+              <div class="empty-state">
+                <div class="empty-state__icon">
+                  <i class="bi {% if mostrar_inactivos %}bi-person-dash{% else %}bi-person-plus{% endif %}" aria-hidden="true"></i>
+                </div>
+                {% if mostrar_inactivos %}
+                  <p class="empty-state__title">No hay pacientes inactivos</p>
+                  <p class="empty-state__text">
+                    Los pacientes desactivados aparecerán en este listado.
+                  </p>
+                {% else %}
+                  <p class="empty-state__title">Todavía no hay pacientes activos</p>
+                  <p class="empty-state__text">
+                    Registra al primer paciente para empezar a gestionar su
+                    historial.
+                  </p>
+                  {% if not request.user.usuario_administrador %}
+                    <a
+                      href="{% url 'registro_p' %}"
+                      class="btn-app btn-app--primary btn-app--sm"
+                    >
+                      Registrar paciente
+                    </a>
+                  {% endif %}
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-footer">
+    <span>
+      {% if q %}
+        Resultados para “{{ q }}”: {{ cantidad }} de {{ cantidad_total }}
+      {% elif mostrar_inactivos %}
+        Total de pacientes inactivos: {{ cantidad }}
+      {% else %}
+        Total de pacientes activos: {{ cantidad }}
+      {% endif %}
+    </span>
+    <span class="table-footer__hint">
+      {% if mostrar_inactivos %}
+        Los registros inactivos se conservan para consulta histórica
+      {% else %}
+        Activos: {{ cantidad_activos }} · Inactivos: {{ cantidad_inactivos }}
+      {% endif %}
+    </span>
+  </div>
+
+  {% include 'crud/_paginacion.html' %}
+</section>
+
 {% endblock %}

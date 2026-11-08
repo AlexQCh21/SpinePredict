@@ -1,50 +1,175 @@
-{% extends 'layout/base.html' %}
-{% load static %}
+{% extends 'layout/base.html' %} {% load static %} {% block title %}{{ accion|default:"Registrar" }} {{ tipo_usuario|lower }} · Hospital Regional{% endblock %} {% block content %}
 
-{% block content %}
-<form action="" method="POST" class="formularioP" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div class="container c_caja">
-        <div class="foto">
-            <div class="imagen">
-                <img src="{% static 'img/user_default.png' %}" alt="" id="img_rp">
-                <label for="{{ form.foto.id_for_label  }}" class="custom-file-label">Seleccionar archivos</label>
-                <!-- <input type="file" id="file-input" class="custom-file-input" accept="image/*"> -->
-                {{ form.foto }}
-            </div>
-
-            
-        </div>
-
-        <div class="inputs">
-            <h1>Registrar un {{ tipo_usuario }}</h1>
-            <div class="contenedor_inputs">
-                <!-- <div class="input-container">
-                    <input type="text" id="text-input" class="custom-input" placeholder=" ">
-                    <label for="text-input" class="custom-label">Primer nombre</label>
-                </div> -->
-
-                {% for field in form %}
-                    <div class="input-container">
-                    {{ field }}
-                    <label for="{{ field.id_for_label }}" class="custom-label">{{ field.label }}</label>
-                    </div>
-                {% endfor %}
-            </div>
-            <button type="submit" class="custom-button">{{ texto_boton }}</button>
-        </div>
+<div class="module-page reg-page">
+  <div class="page-header">
+    <div class="page-header__text">
+      <h1 class="page-title">
+        <i class="bi {% if accion == 'Editar' %}bi-pencil-square{% else %}bi-person-plus{% endif %}" aria-hidden="true"></i>
+        <span>
+          {% if accion == 'Editar' %}Editar{% else %}Registrar{% endif %}
+          {% if tipo_usuario == 'Doctor' %}especialista{% else %}{{ tipo_usuario|lower }}{% endif %}
+        </span>
+      </h1>
+      <p class="page-description">
+        {% if accion == 'Editar' %}
+          Actualiza los datos del registro. Los campos marcados con
+          <span class="field-required">*</span> son obligatorios.
+        {% else %}
+          Completa los datos del nuevo registro. Los campos marcados con
+          <span class="field-required">*</span> son obligatorios.
+        {% endif %}
+      </p>
     </div>
-</form>
+  </div>
+
+  <form
+    id="registro-form"
+    action=""
+    method="post"
+    enctype="multipart/form-data"
+    class="panel reg-panel"
+  >
+    {% csrf_token %}
+
+    <div class="panel__header">
+      <div>
+        <h2 class="panel__title">
+          <i class="bi bi-card-list" aria-hidden="true"></i>
+          Datos del registro
+        </h2>
+        <p class="panel__hint">
+          {{ panel_hint|default:"La información se guardará en el historial del hospital." }}
+        </p>
+      </div>
+    </div>
+
+    {% if form.non_field_errors %}
+      <div class="form-alert" role="alert">
+        <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+        <div>
+          {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="reg-layout">
+      <aside class="reg-photo">
+        <div class="reg-photo__frame">
+          {% if object.foto %}
+            <img
+              id="img_rp"
+              src="{{ object.foto.url }}"
+              alt="Fotografía actual de perfil"
+            />
+          {% else %}
+            <img
+              id="img_rp"
+              src="{% static 'img/user_default.png' %}"
+              alt="Vista previa de la fotografía de perfil"
+            />
+          {% endif %}
+        </div>
+        <div class="reg-photo__body">
+          <p class="reg-photo__title">Fotografía de perfil</p>
+          <label class="visually-hidden" for="{{ form.foto.id_for_label }}">
+            Fotografía de perfil
+          </label>
+          <div class="reg-photo__control">{{ form.foto }}</div>
+          <p class="reg-photo__hint">
+            Opcional. Se utiliza para identificar el registro en los listados.
+          </p>
+        </div>
+      </aside>
+
+      <div class="reg-fields">
+        {% for field in form %}
+          {% if field.name != 'foto' %}
+            {% if field.field.widget.input_type == 'checkbox' %}
+              <div class="field field--wide field--checkbox">
+                {{ field }}
+                <label for="{{ field.id_for_label }}">
+                  {% if field.name == 'usuario_administrador' %}
+                    Usuario administrador
+                  {% else %}
+                    {{ field.label }}
+                  {% endif %}
+                </label>
+              </div>
+            {% else %}
+              <div
+                class="field {% if field.name == 'correo' or field.name == 'email' %}field--wide{% endif %}"
+              >
+                <label for="{{ field.id_for_label }}">
+                  {% if field.name == 'codigo_empl' %}
+                    Código de empleado
+                  {% elif field.name == 'dni' %}
+                    Documento de identidad (DNI)
+                  {% elif field.name == 'contrasena' %}
+                    Contraseña
+                  {% elif field.name == 'confirmar_contrasena' %}
+                    Confirmar contraseña
+                  {% else %}
+                    {{ field.label }}
+                  {% endif %}
+                  {% if field.field.required %}
+                    <span class="field-required" aria-hidden="true">*</span>
+                  {% endif %}
+                </label>
+                {{ field }}
+                {% for error in field.errors %}
+                  <p class="field-error">{{ error }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="reg-actions">
+      <a
+        href="{% if url_cancelar %}{{ url_cancelar }}{% elif tipo_usuario == 'paciente' %}{% url 'paciente' %}{% elif tipo_usuario == 'Administrador' %}{% url 'administrador' %}{% else %}{% url 'especialista' %}{% endif %}"
+        class="btn-app btn-app--ghost"
+      >
+        <i class="bi bi-arrow-left" aria-hidden="true"></i>
+        {% if texto_cancelar %}{{ texto_cancelar }}{% elif accion == 'Editar' %}Volver a la ficha{% else %}Volver al listado{% endif %}
+      </a>
+      <button type="submit" id="registro-submit" class="btn-app btn-app--primary">
+        <i class="bi bi-check2" aria-hidden="true"></i>
+        {{ texto_boton }}
+      </button>
+    </div>
+  </form>
+</div>
+
+{% endblock %} {% block extra_js %}
 <script>
-    const img = document.getElementById('img_rp');
-    const input = document.getElementById('id_foto');
+  (function () {
+    const input = document.getElementById("id_foto");
+    const image = document.getElementById("img_rp");
+    if (input && image) {
+      let currentUrl = null;
+      input.addEventListener("change", function () {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        if (currentUrl) URL.revokeObjectURL(currentUrl);
+        currentUrl = URL.createObjectURL(file);
+        image.src = currentUrl;
+      });
+    }
 
-    input.addEventListener('change',()=>{
-        img.src = URL.createObjectURL(input.files[0]);
-    });
+    const form = document.getElementById("registro-form");
+    const submit = document.getElementById("registro-submit");
+    if (form && submit) {
+      form.addEventListener("submit", function () {
+        submit.disabled = true;
+        submit.setAttribute("aria-busy", "true");
+        submit.innerHTML =
+          '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Guardando…';
+      });
+    }
+  })();
 </script>
-
-
-
 {% endblock %}
-

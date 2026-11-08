@@ -1,0 +1,166 @@
+{% extends 'crud/basecrud.html' %} {% load static %} {% block title %}Ficha del paciente · Hospital Regional{% endblock %} {% block page_title %}{{ paciente.primer_nombre }} {{ paciente.apellido_paterno }}{% endblock %} {% block icon_crud %}<i class="bi bi-person-vcard" aria-hidden="true"></i>{% endblock %} {% block descripcion %} Consulta los datos del paciente y el historial de diagnósticos registrados. {% endblock %} {% block page_actions %}
+  <div class="page-header__actions">
+    <a href="{% url 'paciente' %}" class="btn-app btn-app--ghost">
+      <i class="bi bi-arrow-left" aria-hidden="true"></i>
+      Volver al listado
+    </a>
+    {% if not request.user.usuario_administrador and paciente.activo %}
+      <a href="{% url 'paciente_editar' paciente.id %}" class="btn-app btn-app--secondary">
+        <i class="bi bi-pencil-square" aria-hidden="true"></i>
+        Editar ficha
+      </a>
+      <a href="{% url 'diagnostico2' paciente.id %}" class="btn-app btn-app--primary">
+        <i class="bi bi-activity" aria-hidden="true"></i>
+        Nuevo diagnóstico
+      </a>
+    {% endif %}
+  </div>
+{% endblock %} {% block crud_mod %}
+
+<div class="stack">
+  <section class="panel patient-detail">
+    <div class="panel__header">
+      <div>
+        <h2 class="panel__title">
+          <i class="bi bi-person-lines-fill" aria-hidden="true"></i>
+          Datos del paciente
+        </h2>
+        <p class="panel__hint">Información registrada en el sistema.</p>
+      </div>
+      {% if paciente.activo %}
+        <span class="badge-status badge-status--ok">Activo</span>
+      {% else %}
+        <span class="badge-status badge-status--danger">Inactivo</span>
+      {% endif %}
+    </div>
+
+    <div class="patient-detail__body">
+      <div class="patient-detail__identity">
+        <span class="avatar-cell avatar-cell--lg">
+          {% if paciente.foto %}
+            <img src="{{ paciente.foto.url }}" alt="Fotografía de {{ paciente.primer_nombre }} {{ paciente.apellido_paterno }}" loading="lazy" />
+          {% else %}
+            <img src="{% static 'img/user_default.png' %}" alt="" loading="lazy" />
+          {% endif %}
+        </span>
+        <div>
+          <p class="patient-detail__name">
+            {{ paciente.primer_nombre }} {{ paciente.segundo_nombre }}
+            {{ paciente.apellido_paterno }} {{ paciente.apellido_materno }}
+          </p>
+          <p class="patient-detail__sub">DNI {{ paciente.dni }}</p>
+        </div>
+      </div>
+
+      <dl class="patient-detail__grid">
+        <div>
+          <dt>Documento</dt>
+          <dd>{{ paciente.dni }}</dd>
+        </div>
+        <div>
+          <dt>Correo</dt>
+          <dd>{% if paciente.correo %}{{ paciente.correo }}{% else %}No registrado{% endif %}</dd>
+        </div>
+        <div>
+          <dt>Teléfono</dt>
+          <dd>{% if paciente.telefono %}{{ paciente.telefono }}{% else %}No registrado{% endif %}</dd>
+        </div>
+        <div>
+          <dt>Fecha de registro</dt>
+          <dd>{{ paciente.fecha_creacion|date:"d/m/Y H:i" }}</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel__header">
+      <div>
+        <h2 class="panel__title">
+          <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i>
+          Historial de diagnósticos
+        </h2>
+        <p class="panel__hint">
+          Diagnósticos registrados para este paciente, del más reciente al más
+          antiguo.
+        </p>
+      </div>
+    </div>
+
+    <div class="table-scroll">
+      <table class="table-app table-app--cards">
+        <caption>Diagnósticos del paciente</caption>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Especialista</th>
+            <th>Predicción</th>
+            <th>Confianza</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for h in historial %}
+            <tr>
+              <td class="cell-muted" data-label="Fecha">
+                {{ h.fecha|date:"d/m/Y H:i" }}
+              </td>
+              <td data-label="Especialista">
+                {{ h.empleado.primer_nombre }} {{ h.empleado.apellido_paterno }}
+              </td>
+              <td data-label="Predicción">
+                {% if h.padecimiento.name == 'Hernia de Disco' %}
+                  <span class="badge-status badge-status--danger">
+                    Hernia de disco
+                  </span>
+                {% elif h.padecimiento.name == 'Espondilolistesis' %}
+                  <span class="badge-status badge-status--warn">
+                    Espondilolistesis
+                  </span>
+                {% else %}
+                  <span class="badge-status badge-status--ok">Normal</span>
+                {% endif %}
+              </td>
+              <td class="tabular" data-label="Confianza">
+                {{ h.precision_value|floatformat:1 }}%
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="4">
+                <div class="empty-state">
+                  <div class="empty-state__icon">
+                    <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i>
+                  </div>
+                  <p class="empty-state__title">Aún no hay diagnósticos</p>
+                  <p class="empty-state__text">
+                    Los diagnósticos realizados a este paciente aparecerán en
+                    este historial.
+                  </p>
+                  {% if not request.user.usuario_administrador and paciente.activo %}
+                    <a
+                      href="{% url 'diagnostico2' paciente.id %}"
+                      class="btn-app btn-app--primary btn-app--sm"
+                    >
+                      Nuevo diagnóstico
+                    </a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span>Total de diagnósticos: {{ cantidad }}</span>
+      <span class="table-footer__hint">
+        Ordenados del más reciente al más antiguo
+      </span>
+    </div>
+
+    {% include 'crud/_paginacion.html' %}
+  </section>
+</div>
+
+{% endblock %}

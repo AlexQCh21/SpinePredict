@@ -1,234 +1,408 @@
-{% extends 'layout/base.html' %} {% load static %}  {% block content %}
+{% extends 'layout/base.html' %} {% load static %} {% block title %}Resumen clínico · Hospital Regional{% endblock %} {% block content %}
 
-<div class="contenedor_dashboard container">
-  <div class="title">
-    <h1 class="titulo">Dashboard</h1>
-    <span>Descripción general y resumen de diagnósticos</span>
-    <!-- {{ precision_n.precision_value__avg|floatformat:2 }} -->
+<div class="dashboard">
+  <div class="page-header">
+    <div class="page-header__text">
+      <h1 class="page-title">Resumen clínico</h1>
+      <p class="page-description">
+        Actividad diagnóstica y estado del servicio de columna vertebral.
+      </p>
+    </div>
+    {% if request.user.usuario_administrador == 0 %}
+      <div class="page-header__actions">
+        <a href="{% url 'diagnostico' %}" class="btn-app btn-app--primary">
+          <i class="bi bi-plus-lg" aria-hidden="true"></i>
+          Nuevo diagnóstico
+        </a>
+      </div>
+    {% endif %}
   </div>
 
-  <div class="cards">
-    <div class="card_dash">
-      <div class="contenido_dash">
-        <h1 class="cantidad">{{ diagnosticos_cantidad }}</h1>
-        <div class="des_dash">
-          <div class="variable">Diagnósticos</div>
-          <div class="indicador">
-            <i class="bi bi-arrow-up-short"></i> Diagnósticos realizados
+  <section class="stat-strip" aria-label="Indicadores del servicio">
+    <div class="stat">
+      <span class="stat__label">Diagnósticos</span>
+      <strong class="stat__value">{{ diagnosticos_cantidad }}</strong>
+      <span class="stat__note">Registros acumulados</span>
+    </div>
+    <div class="stat">
+      <span class="stat__label">Pacientes</span>
+      <strong class="stat__value">{{ cantidad_paciente }}</strong>
+      <span class="stat__note">Pacientes activos</span>
+    </div>
+    <div class="stat">
+      <span class="stat__label">Especialistas</span>
+      <strong class="stat__value">{{ cantidad_especialista }}</strong>
+      <span class="stat__note">Personal habilitado</span>
+    </div>
+  </section>
+
+  <div class="dashboard__grid">
+    <section class="panel chart-panel">
+      <div class="panel__header">
+        <h2 class="panel__title">
+          <i class="bi bi-pie-chart" aria-hidden="true"></i>
+          Distribución por diagnóstico
+        </h2>
+      </div>
+      <div class="chart-panel__body">
+        <div class="chart-canvas">
+          <canvas
+            id="chart_2"
+            role="img"
+            aria-label="Distribución de diagnósticos entre columna normal, hernia de disco y espondilolistesis"
+          ></canvas>
+          {% if diagnosticos_cantidad == 0 %}
+            <div class="chart-empty">
+              <i class="bi bi-bar-chart" aria-hidden="true"></i>
+              <span>Sin diagnósticos registrados</span>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <section class="panel chart-panel">
+      <div class="panel__header">
+        <h2 class="panel__title">
+          <i class="bi bi-bar-chart" aria-hidden="true"></i>
+          Casos por patología
+        </h2>
+      </div>
+      <div class="chart-panel__body">
+        <div class="chart-canvas">
+          <canvas
+            id="chart_1"
+            role="img"
+            aria-label="Cantidad de casos por patología"
+          ></canvas>
+          {% if diagnosticos_cantidad == 0 %}
+            <div class="chart-empty">
+              <i class="bi bi-bar-chart" aria-hidden="true"></i>
+              <span>Sin diagnósticos registrados</span>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel chart-panel chart-panel--wide">
+    <div class="panel__header">
+      <h2 class="panel__title">
+        <i class="bi bi-speedometer2" aria-hidden="true"></i>
+        Precisión promedio del modelo
+      </h2>
+    </div>
+    <div class="chart-panel__body">
+      <div class="chart-canvas chart-canvas--sm">
+        <canvas
+          id="chart_3"
+          role="img"
+          aria-label="Precisión promedio del modelo por diagnóstico"
+        ></canvas>
+        {% if diagnosticos_cantidad == 0 %}
+          <div class="chart-empty">
+            <i class="bi bi-speedometer2" aria-hidden="true"></i>
+            <span>Sin diagnósticos registrados</span>
           </div>
-        </div>
+        {% endif %}
       </div>
-      <div class="icon_dash">
-        <i class="bi bi-clipboard2-pulse"></i>
-      </div>
+    </div>
+  </section>
+
+  <section class="panel table-panel">
+    <div class="panel__header">
+      <h2 class="panel__title">
+        <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i>
+        Diagnósticos recientes
+      </h2>
+      <a href="{% url 'historial_d' %}" class="btn-app btn-app--ghost btn-app--sm">
+        Ver historial
+      </a>
     </div>
 
-    <div class="card_dash">
-      <div class="contenido_dash">
-        <h1 class="cantidad">4</h1>
-        <div class="des_dash">
-          <div class="variable">Especialistas</div>
-          <div class="indicador">
-            <i class="bi bi-arrow-up-short"></i> 2% el último més
-          </div>
-        </div>
-      </div>
-      <div class="icon_dash">
-        <i class="bi bi-person-vcard"></i>
-      </div>
-    </div>
-
-    <div class="card_dash">
-      <div class="contenido_dash">
-        <h1 class="cantidad">{{ cantidad_paciente }}</h1>
-        <div class="des_dash">
-          <div class="variable">Pacientes</div>
-          <div class="indicador">+ pacientes en el sistema</div>
-        </div>
-      </div>
-      <div class="icon_dash">
-        <i class="bi bi-person-heart"></i>
-      </div>
-    </div>
-  </div>
-
-  <!-- <div class="graficos">
-    <div class="row_g">
-      <div class="chart">
-        <canvas id="chart_1"></canvas>
-      </div>
-      <div class="chart">
-        <canvas id="chart_2"></canvas>
-      </div>
-    </div>
-  </div> -->
-
-  <!-- Añadir graficos -->
-  <div class="graphBox">
-    <div class="box">
-      <canvas id="chart_2"></canvas>
-    </div>
-    <div class="box">
-      <canvas id="chart_1"></canvas>
-    </div>
-    
-  </div>
-
-  <div class="graphBox d-flex">
-    <div class="box ancho_t">
-      <canvas id="chart_3"></canvas>
-    </div>
-  </div>
-
-  <div class="tabla_pacientes_diag">
-    <div class="tabla_contenido">
-      <h1>Diagnósticos de Pacientes</h1>
-      <div class="tabla_pacientes_d" style="max-height: 400px; overflow-y: auto;">
-        <table class="table tabla_p" >
-          <thead>
+    <div class="table-scroll table-panel__scroll">
+      <table class="table-app">
+        <thead>
+          <tr>
+            <th scope="col"><span class="">Paciente</span></th>
+            <th scope="col">Nombres</th>
+            <th scope="col">Apellidos</th>
+            <th scope="col" class="num">Precisión</th>
+            <th scope="col">Padecimiento</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in historial_diagnosticos %}
             <tr>
-              <th scope="col">#</th>
-              <th scope="col">Nombres</th>
-              <th scope="col">Apellidos</th>
-              <th scope="col">Precisión</th>
-              <th scope="col">Padecimiento</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for p in historial_diagnosticos %}
-            <tr>
-              <td>
+              <td class="avatar-cell">
                 {% if not p.paciente.foto %}
-                  <img src="{% static 'img/user_default.png' %}" alt="foto del paciente" height="45" style="border-radius: 100%; border:1px solid #7e7e7e;"/>
+                  <img
+                    src="{% static 'img/user_default.png' %}"
+                    alt="Foto de {{ p.paciente.primer_nombre }}"
+                    loading="lazy"
+                  />
                 {% else %}
-                  <img src="{{ p.paciente.foto.url }}" alt="foto del paciente" height="45" style="border-radius: 100%; border:1px solid #7e7e7e;"/>
+                  <img
+                    src="{{ p.paciente.foto.url }}"
+                    alt="Foto de {{ p.paciente.primer_nombre }}"
+                    loading="lazy"
+                  />
                 {% endif %}
               </td>
-              <td>{{ p.paciente.primer_nombre|add:" "|add:p.paciente.segundo_nombre }}</td>
-              <td>{{ p.paciente.apellido_paterno|add:" "|add:p.paciente.apellido_materno }}</td>
-              <td>{{ p.precision_value}}%</td>
+              <td class="cell-name">
+                {{ p.paciente.primer_nombre|add:" "|add:p.paciente.segundo_nombre }}
+              </td>
+              <td>
+                {{ p.paciente.apellido_paterno|add:" "|add:p.paciente.apellido_materno }}
+              </td>
+              <td class="num cell-strong">{{ p.precision_value }}%</td>
               <td>
                 {% if p.padecimiento.name == 'Hernia de Disco' %}
-                  <span class="badge text-bg-danger">Hernia de disco</span>
+                  <span class="badge-status badge-status--danger">Hernia de disco</span>
                 {% elif p.padecimiento.name == 'Espondilolistesis' %}
-                  <span class="badge text-bg-warning">Spondylosis</span>
+                  <span class="badge-status badge-status--warn">Espondilolistesis</span>
                 {% else %}
-                  <span class="badge text-bg-success">Normal</span>
+                  <span class="badge-status badge-status--ok">Columna normal</span>
                 {% endif %}
-  
               </td>
-  
             </tr>
-            {% endfor %}
-  
-          </tbody>
-        </table>
-      </div>
+          {% empty %}
+            <tr>
+              <td colspan="5">
+                <div class="empty-state">
+                  <div class="empty-state__icon">
+                    <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i>
+                  </div>
+                  <p class="empty-state__title">Todavía no hay diagnósticos</p>
+                  <p class="empty-state__text">
+                    Los diagnósticos aparecerán aquí cuando se registre la primera
+                    evaluación.
+                  </p>
+                  {% if request.user.usuario_administrador == 0 %}
+                    <a href="{% url 'diagnostico' %}" class="btn-app btn-app--primary btn-app--sm">
+                      Iniciar un diagnóstico
+                    </a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-  </div>
+
+    <div class="table-footer">
+      <span>{{ diagnosticos_cantidad }} diagnósticos registrados</span>
+      <span class="table-footer__hint">Ordenados del más reciente al más antiguo</span>
+    </div>
+
+    {% include 'crud/_paginacion.html' %}
+  </section>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
-  const ctx = document.getElementById("chart_1");
-  const ctx2 = document.getElementById("chart_2");
-  const ctx3 = document.getElementById("chart_3");
+  (function () {
+    const root = getComputedStyle(document.documentElement);
+    const color = (name, fallback) => (root.getPropertyValue(name) || fallback).trim();
 
-  new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: ["Normal", "Hernia de disco", "Spondylosis"],
-      datasets: [
-        {
-          label: "Patologías de la columna",
-          data: [{{ normal_count }}, {{ hernia_count }}, {{ spon_count }}],
-          borderWidth: 1,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-    },
-  });
+    const palette = {
+      ok: color("--ok", "#2c7a57"),
+      danger: color("--danger", "#a64038"),
+      warn: color("--warn", "#96631a"),
+      brand: color("--brand", "#0c514a"),
+      ink: color("--ink", "#122a28"),
+      muted: color("--muted", "#5f7672"),
+      line: "rgba(18, 42, 40, 0.09)",
+      surface: "#ffffff",
+    };
 
-  new Chart(ctx2, {
-    type: "doughnut",
-    data: {
-      labels: ["Normal", "Hernia de disco", "Spondylosis"],
-      datasets: [
-        {
-          label: "Cantidad",
-          data: [{{ normal_count }}, {{ hernia_count }}, {{ spon_count }}],
-          backgroundColor: [
-            "rgb(255, 99, 132)",
-            "rgb(54, 162, 235)",
-            "rgb(255, 205, 86)",
+    const labels = ["Columna normal", "Hernia de disco", "Espondilolistesis"];
+    const counts = [{{ normal_count }}, {{ hernia_count }}, {{ spon_count }}];
+    const barColors = [palette.ok, palette.danger, palette.warn];
+
+    Chart.defaults.font.family = "Archivo, 'Segoe UI', sans-serif";
+    Chart.defaults.font.size = 12;
+    Chart.defaults.color = palette.muted;
+
+    const tooltip = {
+      backgroundColor: "#ffffff",
+      titleColor: palette.ink,
+      bodyColor: palette.muted,
+      borderColor: "rgba(18, 42, 40, 0.12)",
+      borderWidth: 1,
+      padding: 11,
+      cornerRadius: 8,
+      displayColors: true,
+      boxPadding: 4,
+      titleFont: { family: "Archivo, sans-serif", weight: "600", size: 12 },
+      bodyFont: { family: "Archivo, sans-serif", size: 12 },
+    };
+
+    const legend = {
+      position: "bottom",
+      labels: {
+        usePointStyle: true,
+        pointStyle: "circle",
+        boxWidth: 7,
+        boxHeight: 7,
+        padding: 16,
+        color: palette.muted,
+        font: { family: "Archivo, sans-serif", size: 12 },
+      },
+    };
+
+    const ctx1 = document.getElementById("chart_1");
+    const ctx2 = document.getElementById("chart_2");
+    const ctx3 = document.getElementById("chart_3");
+
+    if (ctx2) {
+      new Chart(ctx2, {
+        type: "doughnut",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              data: counts,
+              backgroundColor: barColors,
+              borderColor: palette.surface,
+              borderWidth: 3,
+              hoverOffset: 4,
+              spacing: 2,
+            },
           ],
-          hoverOffset: 4,
         },
-      ],
-    },
-    options: {
-      responsive: true, // Habilita la responsividad
-      maintainAspectRatio: false, // Desactiva la relación de aspecto fija
-    },
-  });
-
-
-  const labels = ["Normal", "Hernia de disco", "Spondylosis"];
-
-  // Para Normal
-  let precisionValue = "{{ precision_n.precision_value__avg|floatformat:2 }}";
-  // Reemplazar la coma por un punto y convertir a número flotante
-  precisionValue = parseFloat(precisionValue.replace(',', '.'));
-
-  // Para hernia
-  let precisionValueh = "{{ precision_hernia.precision_value__avg|floatformat:2 }}";
-  // Reemplazar la coma por un punto y convertir a número flotante
-  precisionValueh = parseFloat(precisionValueh.replace(',', '.'));
-
-
-  // Para spon
-  let precisionValues = "{{ precision_spon.precision_value__avg|floatformat:2 }}";
-  // Reemplazar la coma por un punto y convertir a número flotante
-  precisionValues = parseFloat(precisionValues.replace(',', '.'));
-
-
-
-  new Chart(ctx3, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Precisión promedio de las predicciones',
-        data: [precisionValue, precisionValueh, precisionValues],
-        fill: false,
-        backgroundColor: [          
-          'rgba(46, 204, 113, 0.2)',
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(255, 205, 86, 0.2)',
-          'rgba(75, 192, 192, 0.2)',
-          'rgba(54, 162, 235, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(201, 203, 207, 0.2)'
-        ],
-        borderColor: [          
-          'rgb(35, 155, 86)',
-          'rgb(255, 99, 132)',
-          'rgb(255, 205, 86)',
-          'rgb(75, 192, 192)',
-          'rgb(54, 162, 235)',
-          'rgb(153, 102, 255)',
-          'rgb(201, 203, 207)'
-        ],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      indexAxis: 'y',
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: "68%",
+          animation: { duration: 700 },
+          plugins: {
+            legend: legend,
+            tooltip: {
+              ...tooltip,
+              callbacks: {
+                label: (ctx) => ` ${ctx.label}: ${ctx.parsed} diagnósticos`,
+              },
+            },
+          },
+        },
+      });
     }
-  });
+
+    if (ctx1) {
+      new Chart(ctx1, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              data: counts,
+              backgroundColor: barColors,
+              borderRadius: 6,
+              borderSkipped: false,
+              maxBarThickness: 56,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 700 },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              ...tooltip,
+              callbacks: {
+                label: (ctx) => ` ${ctx.parsed.y} diagnósticos`,
+              },
+            },
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              border: { display: false },
+              ticks: {
+                color: palette.muted,
+                font: { family: "Archivo, sans-serif", size: 11 },
+              },
+            },
+            y: {
+              beginAtZero: true,
+              ticks: { precision: 0, color: palette.muted },
+              grid: { color: palette.line },
+              border: { display: false },
+            },
+          },
+        },
+      });
+    }
+
+    function toNumber(value) {
+      const parsed = parseFloat(String(value).replace(",", "."));
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    const precisionValues = [
+      toNumber("{{ precision_n.precision_value__avg|floatformat:2 }}"),
+      toNumber("{{ precision_hernia.precision_value__avg|floatformat:2 }}"),
+      toNumber("{{ precision_spon.precision_value__avg|floatformat:2 }}"),
+    ];
+
+    if (ctx3) {
+      new Chart(ctx3, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              data: precisionValues,
+              backgroundColor: barColors,
+              borderRadius: 6,
+              borderSkipped: false,
+              maxBarThickness: 26,
+            },
+          ],
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 700 },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              ...tooltip,
+              callbacks: {
+                label: (ctx) => ` ${ctx.parsed.x.toFixed(1)} % de precisión`,
+              },
+            },
+          },
+          scales: {
+            x: {
+              beginAtZero: true,
+              max: 100,
+              grid: { color: palette.line },
+              border: { display: false },
+              ticks: {
+                color: palette.muted,
+                callback: (value) => `${value}%`,
+              },
+            },
+            y: {
+              grid: { display: false },
+              border: { display: false },
+              ticks: {
+                color: palette.muted,
+                font: { family: "Archivo, sans-serif", size: 11 },
+              },
+            },
+          },
+        },
+      });
+    }
+  })();
 </script>
 
 {% endblock %}

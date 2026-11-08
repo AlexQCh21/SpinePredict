@@ -1,20 +1,18 @@
-{% extends 'layout/base.html' %}
-{% block content %}
-<div class="contenedor_modulo container">
-    <div class="title">
-      <h1 class="titulo d-flex align-items-center gap-2">{{ titulo }}
-        {% block icon_crud %} {% endblock %}
-        
-      </h1>
-      <span>{% block descripcion %} {% endblock %}</span>
-    </div>
+{% extends 'layout/base.html' %} {% load static %} {% block title %}{{ titulo }} · Hospital Regional{% endblock %} {% block content %}
 
-    <div class="contenedor_modulo_t">
-      {% block crud_mod %} 
-      
-      {% endblock %}
+<div class="module-page crud-page">
+  <div class="page-header">
+    <div class="page-header__text">
+      <h1 class="page-title">
+        {% block icon_crud %}{% endblock %}
+        <span>{% block page_title %}{{ titulo }}{% endblock %}</span>
+      </h1>
+      <p class="page-description">{% block descripcion %}{% endblock %}</p>
     </div>
+    {% block page_actions %}{% endblock %}
   </div>
+
+  {% block crud_mod %}{% endblock %}
 </div>
 
 {% endblock %}

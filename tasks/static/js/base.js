@@ -1,79 +1,144 @@
-document.addEventListener('DOMContentLoaded',function(){
-    let btn_nav = document.querySelector(".btn-menu-nav");
-      const sidebar = document.querySelector(".sidebar");
-      /* elemento agregado */
-      const opciones = document.querySelector(".opciones_sidebar");
-      /**************** */
-      let m_content = document.querySelector(".main_content");
-      let avatar = document.querySelector("#avatar_1");
-      let panel_avatar = document.querySelector(".panel-conf");
-      let icon_noti = document.querySelector("#icon_noti");
-      let notificaciones = document.querySelector(".noti-panel");
+document.addEventListener("DOMContentLoaded", function () {
+  const menuBtn = document.getElementById("menu_toggle");
+  const sidebar = document.getElementById("sidebar");
+  const backdrop = document.getElementById("sidebar_backdrop");
+  const perfilTrigger = document.getElementById("perfil_trigger");
+  const panelConf = document.getElementById("panel_conf");
+  const notiTrigger = document.getElementById("icon_noti");
+  const notiPanel = document.getElementById("noti_panel");
 
-      sidebarToggle();
-      avatarToggle();
-      notiToggle();
+  const mobileQuery = window.matchMedia("(max-width: 1024px)");
 
-      function sidebarToggle() {
-        btn_nav.onclick = (event) => {
-          event.stopPropagation(); // Detiene la propagación del clic
-          sidebar.classList.toggle("ocultar");
-          opciones.classList.toggle("ocultar_f");
-        };
+  function isMobile() {
+    return mobileQuery.matches;
+  }
+
+  function setExpanded(el, expanded) {
+    if (el) el.setAttribute("aria-expanded", String(expanded));
+  }
+
+  function syncMenuButton() {
+    if (!menuBtn || !sidebar) return;
+    const expanded = isMobile()
+      ? sidebar.classList.contains("is-open")
+      : !sidebar.classList.contains("is-collapsed");
+    setExpanded(menuBtn, expanded);
+  }
+
+  function openSidebar() {
+    if (!sidebar) return;
+    sidebar.classList.add("is-open");
+    if (backdrop) backdrop.classList.add("is-visible");
+    document.body.classList.add("nav-open");
+    syncMenuButton();
+  }
+
+  function closeSidebar() {
+    if (!sidebar) return;
+    sidebar.classList.remove("is-open");
+    if (backdrop) backdrop.classList.remove("is-visible");
+    document.body.classList.remove("nav-open");
+    syncMenuButton();
+  }
+
+  function toggleSidebar() {
+    if (!sidebar) return;
+    if (isMobile()) {
+      if (sidebar.classList.contains("is-open")) {
+        closeSidebar();
+      } else {
+        openSidebar();
       }
+      return;
+    }
 
-      function avatarToggle() {
-        avatar.onclick = (event) => {
-          event.stopPropagation();
-          panel_avatar.classList.toggle("d-none");
+    const collapsed = sidebar.classList.toggle("is-collapsed");
+    setExpanded(menuBtn, !collapsed);
+  }
 
-          if (
-            !notificaciones.classList.contains("d-none") &&
-            !notificaciones.contains(event.target) &&
-            event.target !== icon_noti
-          ) {
-            notificaciones.classList.add("d-none");
-          }
-        };
-      }
+  function closePanel(panel, trigger) {
+    if (!panel || panel.classList.contains("d-none")) return;
+    panel.classList.add("d-none");
+    setExpanded(trigger, false);
+  }
 
-      function notiToggle() {
-        icon_noti.onclick = (event) => {
-          event.stopPropagation(); // Detiene la propagación del clic
-          notificaciones.classList.toggle("d-none");
+  function togglePanel(panel, trigger) {
+    if (!panel) return;
+    const willOpen = panel.classList.contains("d-none");
+    panel.classList.toggle("d-none");
+    setExpanded(trigger, willOpen);
+  }
 
-          if (
-            !panel_avatar.classList.contains("d-none") &&
-            !panel_avatar.contains(event.target) &&
-            event.target !== avatar
-          ) {
-            panel_avatar.classList.add("d-none");
-          }
-        };
-      }
+  if (menuBtn) {
+    menuBtn.addEventListener("click", toggleSidebar);
+    syncMenuButton();
+  }
 
-      // Evento para ocultar los elementos con clase "d-none" cuando se hace clic fuera de ellos
-      document.onclick = (event) => {
-        togglePanels();
-      };
+  if (backdrop) {
+    backdrop.addEventListener("click", closeSidebar);
+  }
 
-      function togglePanels() {
-        // Si el clic no es en el avatar ni en el panel de avatar, ocultamos el panel
-        if (
-          !panel_avatar.classList.contains("d-none") &&
-          !panel_avatar.contains(event.target) &&
-          event.target !== avatar
-        ) {
-          panel_avatar.classList.add("d-none");
-        }
+  if (sidebar) {
+    sidebar.querySelectorAll("a").forEach(function (link) {
+      link.addEventListener("click", function () {
+        if (isMobile()) closeSidebar();
+      });
+    });
+  }
 
-        // Si el clic no es en el icono de notificación ni en el panel de notificaciones, ocultamos el panel
-        if (
-          !notificaciones.classList.contains("d-none") &&
-          !notificaciones.contains(event.target) &&
-          event.target !== icon_noti
-        ) {
-          notificaciones.classList.add("d-none");
-        }
-      }
+  if (perfilTrigger && panelConf) {
+    perfilTrigger.addEventListener("click", function (event) {
+      event.stopPropagation();
+      togglePanel(panelConf, perfilTrigger);
+      closePanel(notiPanel, notiTrigger);
+    });
+  }
+
+  if (notiTrigger && notiPanel) {
+    notiTrigger.addEventListener("click", function (event) {
+      event.stopPropagation();
+      togglePanel(notiPanel, notiTrigger);
+      closePanel(panelConf, perfilTrigger);
+    });
+  }
+
+  document.addEventListener("click", function (event) {
+    if (panelConf && perfilTrigger && !panelConf.contains(event.target) && !perfilTrigger.contains(event.target)) {
+      closePanel(panelConf, perfilTrigger);
+    }
+    if (notiPanel && notiTrigger && !notiPanel.contains(event.target) && !notiTrigger.contains(event.target)) {
+      closePanel(notiPanel, notiTrigger);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== "Escape") return;
+    closePanel(panelConf, perfilTrigger);
+    closePanel(notiPanel, notiTrigger);
+    if (isMobile() && sidebar && sidebar.classList.contains("is-open")) {
+      closeSidebar();
+    }
+  });
+
+  document.addEventListener("submit", function (event) {
+    const form = event.target.closest("form[data-confirm]");
+    if (!form) return;
+    if (!window.confirm(form.getAttribute("data-confirm"))) {
+      event.preventDefault();
+    }
+  });
+
+  function handleViewportChange() {
+    if (!isMobile()) {
+      closeSidebar();
+      document.body.classList.remove("nav-open");
+    }
+    syncMenuButton();
+  }
+
+  if (mobileQuery.addEventListener) {
+    mobileQuery.addEventListener("change", handleViewportChange);
+  } else if (mobileQuery.addListener) {
+    mobileQuery.addListener(handleViewportChange);
+  }
 });

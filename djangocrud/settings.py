@@ -13,24 +13,52 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 from django.urls import reverse_lazy
 import os
+import sys
+
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    def load_dotenv(*args, **kwargs):
+        return False
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')
+
+TESTING = 'test' in sys.argv
+
+
+def _env_bool(name, default=False):
+    return os.environ.get(name, str(default)).lower() in ('1', 'true', 'yes', 'on')
+
+
+def _env_list(name, default=''):
+    value = os.environ.get(name, default)
+    if not value:
+        return []
+    return [item.strip() for item in value.split(',') if item.strip()]
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-h)w3kmhfqj&=v85d0oo37o_f%&#ggfzqqp9+w1x-j)d&e6#gn@'
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-h)w3kmhfqj&=v85d0oo37o_f%&#ggfzqqp9+w1x-j)d&e6#gn@',
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = _env_bool('DJANGO_DEBUG', default=not TESTING)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = _env_list('DJANGO_ALLOWED_HOSTS')
+if not ALLOWED_HOSTS:
+    ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'testserver']
+
+CSRF_TRUSTED_ORIGINS = _env_list('DJANGO_CSRF_TRUSTED_ORIGINS')
 
 LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/' 
+LOGOUT_REDIRECT_URL = '/'
 
 
 # Application definition
@@ -47,12 +75,14 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'tasks.middleware.DeactivatedUserMiddleware',
     'tasks.middleware.AutoLogout',
     'tasks.middleware.RedirectAuthenticatedUserMiddleware',
     'tasks.middleware.LoginAttemptMiddleware',
@@ -60,6 +90,8 @@ MIDDLEWARE = [
 
 
 AUTO_LOGOUT_DELAY = 300
+
+CSRF_FAILURE_VIEW = 'tasks.errors.csrf_failure'
 
 ROOT_URLCONF = 'djangocrud.urls'
 
@@ -74,6 +106,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'tasks.context_processors.demo',
             ],
         },
     },
@@ -91,6 +124,20 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+DATABASE_URL = os.environ.get('DATABASE_URL', '').strip()
+if DATABASE_URL and not TESTING:
+    import dj_database_url
+
+    DATABASES['default'] = dj_database_url.parse(
+        DATABASE_URL,
+        conn_max_age=int(os.environ.get('DB_CONN_MAX_AGE', '60')),
+        ssl_require=_env_bool('DB_SSL_REQUIRE', default=False),
+    )
+    if os.environ.get('DB_DISABLE_SERVER_SIDE_CURSORS', '').lower() in ('1', 'true', 'yes', 'on'):
+        DATABASES['default'].setdefault('OPTIONS', {})
+        DATABASES['default']['OPTIONS']['server_side_binding'] = False
+        DATABASES['default']['DISABLE_SERVER_SIDE_CURSORS'] = True
 
 
 # Password validation
@@ -130,12 +177,81 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Storage / media
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+SUPABASE_S3_ENDPOINT = os.environ.get('SUPABASE_S3_ENDPOINT', '').strip()
+SUPABASE_S3_REGION = os.environ.get('SUPABASE_S3_REGION', 'us-east-1').strip()
+SUPABASE_S3_ACCESS_KEY_ID = os.environ.get('SUPABASE_S3_ACCESS_KEY_ID', '').strip()
+SUPABASE_S3_SECRET_ACCESS_KEY = os.environ.get('SUPABASE_S3_SECRET_ACCESS_KEY', '').strip()
+SUPABASE_S3_BUCKET = os.environ.get('SUPABASE_S3_BUCKET', '').strip()
+SUPABASE_MEDIA_EXPIRE = int(os.environ.get('SUPABASE_MEDIA_EXPIRE', '3600'))
+USE_SUPABASE_STORAGE = bool(
+    SUPABASE_S3_BUCKET
+    and SUPABASE_S3_ACCESS_KEY_ID
+    and SUPABASE_S3_SECRET_ACCESS_KEY
+    and SUPABASE_S3_ENDPOINT
+    and not TESTING
+)
+
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': (
+            'django.contrib.staticfiles.storage.StaticFilesStorage'
+            if TESTING
+            else 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+        ),
+    },
+}
+
+if USE_SUPABASE_STORAGE:
+    AWS_S3_ENDPOINT_URL = SUPABASE_S3_ENDPOINT
+    AWS_S3_REGION_NAME = SUPABASE_S3_REGION
+    AWS_ACCESS_KEY_ID = SUPABASE_S3_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY = SUPABASE_S3_SECRET_ACCESS_KEY
+    AWS_STORAGE_BUCKET_NAME = SUPABASE_S3_BUCKET
+    AWS_DEFAULT_ACL = None
+    AWS_QUERYSTRING_AUTH = True
+    AWS_QUERYSTRING_EXPIRE = SUPABASE_MEDIA_EXPIRE
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_S3_SIGNATURE_VERSION = 's3v4'
+    AWS_S3_ADDRESSING_STYLE = 'path'
+    STORAGES['default'] = {
+        'BACKEND': 'storages.backends.s3.S3Storage',
+        'OPTIONS': {
+            'endpoint_url': AWS_S3_ENDPOINT_URL,
+            'region_name': AWS_S3_REGION_NAME,
+            'access_key': AWS_ACCESS_KEY_ID,
+            'secret_key': AWS_SECRET_ACCESS_KEY,
+            'bucket_name': AWS_STORAGE_BUCKET_NAME,
+            'default_acl': AWS_DEFAULT_ACL,
+            'querystring_auth': AWS_QUERYSTRING_AUTH,
+            'querystring_expire': AWS_QUERYSTRING_EXPIRE,
+            'file_overwrite': AWS_S3_FILE_OVERWRITE,
+            'signature_version': AWS_S3_SIGNATURE_VERSION,
+            'addressing_style': AWS_S3_ADDRESSING_STYLE,
+        },
+    }
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+
+# Demo mode / shared demo accounts
+DEMO_MODE = _env_bool('DEMO_MODE', default=False)
+DEMO_CLEANUP_INTERVAL_SECONDS = int(os.environ.get('DEMO_CLEANUP_INTERVAL_SECONDS', '3600'))
+DEMO_ADMIN_USERNAME = os.environ.get('DEMO_ADMIN_USERNAME', 'demo_admin')
+DEMO_ADMIN_PASSWORD = os.environ.get('DEMO_ADMIN_PASSWORD', 'Admin12345')
+DEMO_SPECIALIST_USERNAME = os.environ.get('DEMO_SPECIALIST_USERNAME', 'demo_especialista')
+DEMO_SPECIALIST_PASSWORD = os.environ.get('DEMO_SPECIALIST_PASSWORD', 'Especialista12345')
+
+GUNICORN_WORKERS = int(os.environ.get('GUNICORN_WORKERS', '2'))
+GUNICORN_TIMEOUT = int(os.environ.get('GUNICORN_TIMEOUT', '120'))

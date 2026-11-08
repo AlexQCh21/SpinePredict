@@ -1,137 +1,225 @@
-.leyenda_d {
-  color: #636363;
+/* ==========================================================================
+   Flujo de diagnóstico — estructura compartida
+   ========================================================================== */
+
+.module-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
-.contenedor_modulo_t {
+.stepper-wrap {
+  min-width: 0;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0.6rem 0.9rem;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow-panel);
+}
+
+.stepper .step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.stepper .step:not(:last-child) {
   flex: 1;
-  font-family: 'Raleway',sans-serif;
-
-
-
 }
 
-.container_disigne{
-    display: flex;
+.stepper .step:last-child {
+  flex: none;
+}
+
+.step__dot {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease),
+    color 0.2s var(--ease);
+}
+
+.step__label {
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.step.is-current .step__dot {
+  border-color: var(--gold);
+  background: var(--gold-soft);
+  color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(168, 123, 52, 0.12);
+}
+
+.step.is-current .step__label {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.step.is-done .step__dot {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #fff;
+}
+
+.step.is-done .step__label {
+  color: var(--ink-2);
+}
+
+.stepper__line {
+  flex: 1;
+  min-width: 14px;
+  height: 1px;
+  margin: 0 0.65rem;
+  background: var(--line);
+}
+
+/* Barra de herramientas de tablas */
+
+.table-toolbar {
+  padding: 1rem 1.15rem;
+}
+
+.table-toolbar__search {
+  position: relative;
+  flex: 1;
+  min-width: 210px;
+  max-width: 340px;
+}
+
+.table-toolbar__search > i {
+  position: absolute;
+  top: 50%;
+  left: 0.85rem;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 0.95rem;
+  pointer-events: none;
+}
+
+.table-toolbar__search input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0.5rem 0.9rem 0.5rem 2.35rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-input);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  transition: border-color 0.18s var(--ease), box-shadow 0.18s var(--ease);
+}
+
+.table-toolbar__search input:hover {
+  border-color: #b9cbc6;
+}
+
+.table-toolbar__search input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(12, 81, 74, 0.13);
+  outline: none;
+}
+
+.panel__hint {
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+
+/* Acciones de módulo */
+
+.module-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--line-2);
+  background: var(--surface);
+}
+
+/* Chip de paciente */
+
+.patient-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.patient-chip img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  flex: none;
+}
+
+.patient-chip__meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  min-width: 0;
+}
+
+.patient-chip__name {
+  color: var(--ink);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.patient-chip__sub {
+  color: var(--muted);
+  font-size: var(--fs-xs);
+}
+
+@media (max-width: 700px) {
+  .stepper {
+    padding: 0.55rem 0.65rem;
+  }
+
+  .stepper .step:not(.is-current) .step__label {
+    display: none;
+  }
+
+  .stepper__line {
+    margin: 0 0.4rem;
+  }
+
+  .table-toolbar__search {
+    max-width: none;
+    flex-basis: 100%;
+  }
+
+  .module-actions {
     flex-direction: column;
-    box-shadow: 8px 8px 5px 0px #dbdbdbdf; 
-    background-color: #ffffff; 
-    border-radius: 20px;
+    align-items: stretch;
+  }
+
+  .module-actions .btn-app {
     width: 100%;
-    border: 2px solid #dedede;
-
-
-    .table_header{
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        align-items: center;
-        gap: 1rem;
-        padding: 1rem 0;
-
-        button{
-            outline: none;
-            border: none;
-            /* background-color: #6236ff; */
-            background-color: #34495e;
-            color: #ffffff;
-            padding: 10px 30px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            font-size: 14px;
-            cursor: pointer;
-
-            &:hover{
-                background-color: #2e4053;
-            }
-        }
-
-        select{
-            border: none;
-            border-bottom: 1px solid #c9c9c9;
-            width: 200px;
-            padding: 10px 0;
-            font-size: 16px;
-        }
-
-        .input_search{
-            position: relative;
-            flex-basis: 400px;
-            min-width: 0;
-
-            input{
-                border-radius: 30px;
-                width: 100%;
-                outline: none;
-                border: 1px solid #c9c9c9;
-                box-sizing: border-box;
-                padding-right: 50px;
-                padding: 10px 20px;
-                
-            }
-
-            #search{
-                position: absolute;
-                top: 50%;
-                right: 0;
-                margin-right: 1rem;
-                transform: translate(-50%,-50%);
-               
-            }
-        }        
-
-    }
-
-    .table_paciente{
-        overflow-x: auto;
-        width: 100%;
-    }
-
-    table{
-        width: 100%;
-        border-spacing: 0;
-        margin-top: 1rem;
-        max-height: 400px;
-
-        thead{
-            background-color: #c1c1c1;
-            /* background-color: #fff7b3; */
-
-            th{
-                padding: 10px;
-                text-align: center;
-            }
-        }
-
-        tbody{
-            tr{
-                td{
-                    padding: 10px;
-                    text-align: center;
-                    border-bottom: 1px solid #dfdfdf;
-
-                    button{
-                        outline: none;
-                        border: none;
-                        background-color: #ffffff;
-                    }
-
-                    a{
-                        outline: none;
-                        border: none;
-                    }
-
-                    #icons{
-                        font-size: 20px;
-                        cursor: pointer;
-                        margin-left: 10px;
-                        color: #797979;
-                    }
-                }
-
-                &:hover{
-                    background-color: #f5f5f5;
-                }
-            }
-        }
-    }
+  }
 }

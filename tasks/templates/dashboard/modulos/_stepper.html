@@ -1,0 +1,45 @@
+{% load static %}
+<div class="stepper-wrap">
+  <ol class="stepper" aria-label="Progreso del diagnóstico">
+    <li class="step {% if paso > 1 %}is-done{% elif paso == 1 %}is-current{% endif %}" {% if paso == 1 %}aria-current="step"{% endif %}>
+      <span class="step__dot">
+        {% if paso > 1 %}
+          <i class="bi bi-check2" aria-hidden="true"></i>
+        {% else %}
+          1
+        {% endif %}
+      </span>
+      <span class="step__label">Paciente</span>
+      <span class="stepper__line" aria-hidden="true"></span>
+    </li>
+
+    <li class="step {% if paso > 2 %}is-done{% elif paso == 2 %}is-current{% endif %}" {% if paso == 2 %}aria-current="step"{% endif %}>
+      <span class="step__dot">
+        {% if paso > 2 %}
+          <i class="bi bi-check2" aria-hidden="true"></i>
+        {% else %}
+          2
+        {% endif %}
+      </span>
+      <span class="step__label">Ficha</span>
+      <span class="stepper__line" aria-hidden="true"></span>
+    </li>
+
+    <li class="step {% if paso > 3 %}is-done{% elif paso == 3 %}is-current{% endif %}" {% if paso == 3 %}aria-current="step"{% endif %}>
+      <span class="step__dot">
+        {% if paso > 3 %}
+          <i class="bi bi-check2" aria-hidden="true"></i>
+        {% else %}
+          3
+        {% endif %}
+      </span>
+      <span class="step__label">Parámetros</span>
+      <span class="stepper__line" aria-hidden="true"></span>
+    </li>
+
+    <li class="step {% if paso == 4 %}is-current{% endif %}" {% if paso == 4 %}aria-current="step"{% endif %}>
+      <span class="step__dot">4</span>
+      <span class="step__label">Resultado</span>
+    </li>
+  </ol>
+</div>

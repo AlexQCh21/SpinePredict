@@ -1,0 +1,116 @@
+{% extends 'crud/basecrud.html' %}
+{% load static %}
+{% block title %}Mi perfil · Hospital Regional{% endblock %}
+{% block page_title %}Mi perfil{% endblock %}
+{% block icon_crud %}<i class="bi bi-person-circle" aria-hidden="true"></i>{% endblock %}
+{% block descripcion %}
+  Consulta tus datos personales y administra tus credenciales de acceso.
+{% endblock %}
+{% block page_actions %}
+  <div class="page-header__actions">
+    <a href="{% url 'password_change' %}" class="btn-app btn-app--secondary">
+      <i class="bi bi-key" aria-hidden="true"></i>
+      Cambiar contraseña
+    </a>
+    <a href="{% url 'perfil_editar' %}" class="btn-app btn-app--primary">
+      <i class="bi bi-pencil-square" aria-hidden="true"></i>
+      Editar perfil
+    </a>
+  </div>
+{% endblock %}
+{% block crud_mod %}
+
+<div class="stack">
+  <section class="panel patient-detail">
+    <div class="panel__header">
+      <div>
+        <h2 class="panel__title">
+          <i class="bi bi-person-lines-fill" aria-hidden="true"></i>
+          Datos personales
+        </h2>
+        <p class="panel__hint">Información registrada en el sistema.</p>
+      </div>
+      <div class="badge-group">
+        {% if usuario.usuario_administrador %}
+          <span class="badge-status badge-status--info">Administrador</span>
+        {% else %}
+          <span class="badge-status badge-status--neutral">Especialista</span>
+        {% endif %}
+        {% if usuario.is_active %}
+          <span class="badge-status badge-status--ok">Activo</span>
+        {% else %}
+          <span class="badge-status badge-status--danger">Inactivo</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="patient-detail__body">
+      <div class="patient-detail__identity">
+        <span class="avatar-cell avatar-cell--lg">
+          {% if usuario.foto %}
+            <img src="{{ usuario.foto.url }}" alt="Fotografía de {{ usuario.primer_nombre }} {{ usuario.apellido_paterno }}" loading="lazy" />
+          {% else %}
+            <img src="{% static 'img/user_default.png' %}" alt="" loading="lazy" />
+          {% endif %}
+        </span>
+        <div>
+          <p class="patient-detail__name">
+            {{ usuario.primer_nombre }} {{ usuario.segundo_nombre }}
+            {{ usuario.apellido_paterno }} {{ usuario.apellido_materno }}
+          </p>
+          <p class="patient-detail__sub">Código {{ usuario.codigo_empl }}</p>
+        </div>
+      </div>
+
+      <dl class="patient-detail__grid">
+        <div>
+          <dt>Usuario</dt>
+          <dd>{{ usuario.username }}</dd>
+        </div>
+        <div>
+          <dt>Correo</dt>
+          <dd>{% if usuario.email %}{{ usuario.email }}{% else %}No registrado{% endif %}</dd>
+        </div>
+        <div>
+          <dt>Documento</dt>
+          <dd>{% if usuario.dni %}{{ usuario.dni }}{% else %}No registrado{% endif %}</dd>
+        </div>
+        <div>
+          <dt>Teléfono</dt>
+          <dd>{% if usuario.telefono %}{{ usuario.telefono }}{% else %}No registrado{% endif %}</dd>
+        </div>
+        <div>
+          <dt>Rol</dt>
+          <dd>{% if usuario.usuario_administrador %}Administrador{% else %}Especialista{% endif %}</dd>
+        </div>
+        <div>
+          <dt>Fecha de registro</dt>
+          <dd>{{ usuario.fecha_creacion|date:"d/m/Y H:i" }}</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel__header">
+      <div>
+        <h2 class="panel__title">
+          <i class="bi bi-shield-lock" aria-hidden="true"></i>
+          Seguridad
+        </h2>
+        <p class="panel__hint">
+          La contraseña debe tener al menos 8 caracteres, no puede ser
+          demasiado común ni estar compuesta solo por números.
+        </p>
+      </div>
+    </div>
+    <div class="panel__body">
+      <a href="{% url 'password_change' %}" class="btn-app btn-app--secondary">
+        <i class="bi bi-key" aria-hidden="true"></i>
+        Actualizar contraseña
+      </a>
+    </div>
+  </section>
+</div>
+
+{% endblock %}

@@ -1,0 +1,157 @@
+/* ==========================================================================
+   Páginas de error — lectura clínica
+   ========================================================================== */
+
+.error-body {
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(12, 81, 74, 0.07), transparent 42%),
+    radial-gradient(circle at 88% 92%, rgba(168, 123, 52, 0.09), transparent 38%),
+    var(--bg);
+}
+
+.error-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  min-height: 100dvh;
+  padding: clamp(1.5rem, 6vw, 4rem);
+}
+
+.error-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.error-brand:hover {
+  text-decoration: none;
+}
+
+.error-brand img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.error-brand__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.error-brand__title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.error-brand__subtitle {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.error-card {
+  position: relative;
+  width: min(100%, 560px);
+  padding: clamp(1.75rem, 4vw, 2.85rem);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  background: var(--surface);
+  box-shadow: var(--shadow-pop);
+  text-align: center;
+  overflow: hidden;
+  animation: error-rise 0.5s var(--ease) both;
+}
+
+.error-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: linear-gradient(90deg, var(--brand), var(--gold-2));
+}
+
+.error-card__code {
+  margin: 0 0 0.9rem;
+  color: var(--gold);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.error-card__icon {
+  display: grid;
+  place-items: center;
+  width: 74px;
+  height: 74px;
+  margin: 0 auto 1.15rem;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 2rem;
+}
+
+.error-card__icon--warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.error-card__icon--danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.error-card__title {
+  margin: 0 0 0.6rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 1.4rem + 1vw, 2.1rem);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.error-card__text {
+  max-width: 42ch;
+  margin: 0 auto 1.7rem;
+  color: var(--muted);
+  font-size: var(--fs-base);
+  line-height: 1.6;
+}
+
+.error-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.error-foot {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  text-align: center;
+}
+
+@keyframes error-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .error-card__actions .btn-app {
+    width: 100%;
+  }
+}

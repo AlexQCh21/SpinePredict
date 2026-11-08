@@ -47,6 +47,35 @@ class RedirectAuthenticatedUserMiddleware:
 
 
 
+class DeactivatedUserMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def _cerrar_sesion(self, request):
+        from django.contrib.auth import logout
+
+        logout(request)
+        messages.warning(
+            request,
+            "Tu cuenta está inactiva. Contacta al administrador del sistema.",
+        )
+        return redirect('login')
+
+    def __call__(self, request):
+        if request.user.is_authenticated and not request.user.is_active:
+            return self._cerrar_sesion(request)
+
+        user_id = request.session.get('_auth_user_id')
+        if user_id and not request.user.is_authenticated:
+            from django.contrib.auth import get_user_model
+
+            usuario = get_user_model().objects.filter(pk=user_id).first()
+            if usuario is not None and not usuario.is_active:
+                return self._cerrar_sesion(request)
+
+        return self.get_response(request)
+
+
 from django.contrib.auth import authenticate
 from django.utils.timezone import now
 from datetime import timedelta

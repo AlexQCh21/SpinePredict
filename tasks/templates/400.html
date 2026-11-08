@@ -1,0 +1,10 @@
+{% extends "errors/base_error.html" %}
+
+{% block title %}Solicitud inválida{% endblock %}
+{% block error_code %}Error 400{% endblock %}
+{% block error_icon_class %}error-card__icon--warn{% endblock %}
+{% block error_icon %}bi-exclamation-triangle{% endblock %}
+{% block error_heading %}Solicitud inválida{% endblock %}
+{% block error_text %}
+  La solicitud enviada no es válida o contiene datos incorrectos. Verifica la información e inténtalo nuevamente.
+{% endblock %}

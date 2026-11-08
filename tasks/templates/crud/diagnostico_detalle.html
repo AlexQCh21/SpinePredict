@@ -1,0 +1,140 @@
+{% extends 'crud/basecrud.html' %} {% load static %} {% block title %}Detalle del diagnóstico · Hospital Regional{% endblock %} {% block page_title %}Detalle del diagnóstico{% endblock %} {% block icon_crud %}<i class="bi bi-clipboard2-pulse" aria-hidden="true"></i>{% endblock %} {% block descripcion %} Consulta el resultado y los seis parámetros registrados en este diagnóstico. {% endblock %} {% block page_actions %}
+  <div class="page-header__actions">
+    <a href="{% if origen == 'mis' %}{% url 'historial_m' %}{% else %}{% url 'historial_d' %}{% endif %}" class="btn-app btn-app--ghost">
+      <i class="bi bi-arrow-left" aria-hidden="true"></i>
+      Volver al historial
+    </a>
+    <a href="{% url 'diagnostico_pdf' historial_paciente.id %}" target="_blank" rel="noopener" class="btn-app btn-app--secondary">
+      <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>
+      Ver informe PDF
+    </a>
+  </div>
+{% endblock %} {% block crud_mod %}
+
+<div class="stack">
+  <section class="panel patient-detail">
+    <div class="panel__header">
+      <div>
+        <h2 class="panel__title">
+          <i class="bi bi-clipboard2-check" aria-hidden="true"></i>
+          Resultado del diagnóstico
+        </h2>
+        <p class="panel__hint">
+          Registro del {{ historial_paciente.fecha|date:"d/m/Y H:i" }}.
+        </p>
+      </div>
+      {% if historial_paciente.padecimiento.name == 'Hernia de Disco' %}
+        <span class="badge-status badge-status--danger">Hernia de disco</span>
+      {% elif historial_paciente.padecimiento.name == 'Espondilolistesis' %}
+        <span class="badge-status badge-status--warn">Espondilolistesis</span>
+      {% else %}
+        <span class="badge-status badge-status--ok">Columna normal</span>
+      {% endif %}
+    </div>
+
+    <div class="patient-detail__body">
+      <div class="patient-detail__identity">
+        <span class="avatar-cell avatar-cell--lg">
+          {% if historial_paciente.paciente.foto %}
+            <img src="{{ historial_paciente.paciente.foto.url }}" alt="Fotografía de {{ historial_paciente.paciente.primer_nombre }} {{ historial_paciente.paciente.apellido_paterno }}" loading="lazy" />
+          {% else %}
+            <img src="{% static 'img/user_default.png' %}" alt="" loading="lazy" />
+          {% endif %}
+        </span>
+        <div>
+          <p class="patient-detail__name">
+            {{ historial_paciente.paciente.primer_nombre }} {{ historial_paciente.paciente.segundo_nombre }}
+            {{ historial_paciente.paciente.apellido_paterno }} {{ historial_paciente.paciente.apellido_materno }}
+          </p>
+          <p class="patient-detail__sub">
+            DNI {{ historial_paciente.paciente.dni }}
+          </p>
+        </div>
+      </div>
+
+      <dl class="patient-detail__grid">
+        <div>
+          <dt>Paciente</dt>
+          <dd>
+            <a href="{% url 'paciente_detalle' historial_paciente.paciente.id %}">
+              Ver ficha del paciente
+            </a>
+          </dd>
+        </div>
+        <div>
+          <dt>Especialista</dt>
+          <dd>
+            {{ historial_paciente.empleado.primer_nombre }}
+            {{ historial_paciente.empleado.apellido_paterno }}
+          </dd>
+        </div>
+        <div>
+          <dt>Fecha</dt>
+          <dd>{{ historial_paciente.fecha|date:"d/m/Y H:i" }}</dd>
+        </div>
+        <div>
+          <dt>Confianza del modelo</dt>
+          <dd>{{ historial_paciente.precision_value|floatformat:1 }}%</dd>
+        </div>
+        <div>
+          <dt>Código del especialista</dt>
+          <dd>{{ historial_paciente.empleado.codigo_empl }}</dd>
+        </div>
+        <div>
+          <dt>Predicción</dt>
+          <dd>{{ historial_paciente.padecimiento.name }}</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel__header">
+      <div>
+        <h2 class="panel__title">
+          <i class="bi bi-sliders" aria-hidden="true"></i>
+          Parámetros registrados
+        </h2>
+        <p class="panel__hint">
+          Valores ingresados por el especialista para este diagnóstico.
+        </p>
+      </div>
+    </div>
+
+    {% if datos %}
+      <div class="table-scroll">
+        <table class="table-app table-app--cards">
+          <caption>Parámetros del diagnóstico</caption>
+          <thead>
+            <tr>
+              <th>Parámetro</th>
+              <th class="num">Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for nombre, valor, unidad in parametros %}
+              <tr>
+                <td data-label="Parámetro">{{ nombre }}</td>
+                <td class="tabular" data-label="Valor">{{ valor|floatformat:2 }}{{ unidad }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {% include 'crud/_paginacion.html' %}
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-state__icon">
+          <i class="bi bi-sliders" aria-hidden="true"></i>
+        </div>
+        <p class="empty-state__title">Sin parámetros registrados</p>
+        <p class="empty-state__text">
+          Este diagnóstico no tiene parámetros asociados.
+        </p>
+      </div>
+    {% endif %}
+  </section>
+</div>
+
+{% endblock %}

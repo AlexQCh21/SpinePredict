@@ -136,6 +136,7 @@ class Usuario(AbstractBaseUser):
     dni = models.CharField(max_length=8, validators=[MinLengthValidator(8)], null=True, blank=True)
     foto = models.ImageField('Imagen de perfil', upload_to='usuarios1/', null=True, blank=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    es_demo = models.BooleanField(default=False, db_index=True)
     objects = UsuarioManager()
     
     USERNAME_FIELD = 'username'
@@ -151,7 +152,11 @@ class Usuario(AbstractBaseUser):
     def has_module_perms(self, app_label):
         # Personaliza la lógica de permisos aquí
         return True
-    
+
+    @property
+    def is_active(self):
+        return self.estado_id is not None and self.estado.name == "Activo"
+
     @property
     def is_staff(self):
         return self.usuario_administrador
@@ -169,6 +174,7 @@ class Paciente (models.Model):
     foto = models.ImageField('Imagen de perfil', upload_to='perfil/', null=True, blank=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     activo = models.BooleanField(default=True)
+    es_demo = models.BooleanField(default=False, db_index=True)
     
     def __str__(self):
         return self.dni 
@@ -180,6 +186,7 @@ class Historial_paciente (models.Model):
     fecha = models.DateTimeField(auto_now_add=True)
     
     precision_value = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    es_demo = models.BooleanField(default=False, db_index=True)
     
     def __str__(self):
         return self.padecimiento.name 
@@ -203,6 +210,7 @@ class Crud_empleado(models.Model):
     afectado = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='acciones_afectadas')
     fecha = models.DateTimeField(auto_now_add=True)
     accion = models.CharField(max_length=50)
+    es_demo = models.BooleanField(default=False, db_index=True)
     
     def __str__(self):
         return self.editor.codigo_empl
@@ -213,6 +221,7 @@ class Crud_paciente (models.Model):
     afectado = models.ForeignKey(Paciente,on_delete=models.CASCADE)
     fecha = models.DateTimeField(auto_now_add=True)
     accion = models.CharField(max_length=50)
+    es_demo = models.BooleanField(default=False, db_index=True)
     
     def __str__(self):
         return self.fecha

@@ -1,118 +1,209 @@
-{% extends 'dashboard/diagnostico.html' %} {% load static %} {% block modulo %}
+{% extends 'dashboard/diagnostico.html' %} {% load static %} {% block paso %}{% include 'dashboard/modulos/_stepper.html' with paso=3 %}{% endblock %} {% block modulo %}
 
-<div class="contenedor_etapa3">
-  <div class="etapa3_header">
-    <h2><b>Etapa 2:</b> Parámetros Radiográficos</h2>
+<section class="panel params-panel">
+  <div class="panel__header">
+    <div>
+      <h2 class="panel__title">
+        <i class="bi bi-rulers" aria-hidden="true"></i>
+        Parámetros radiográficos
+      </h2>
+      <p class="panel__hint">
+        Introduce las mediciones obtenidas en la radiografía lateral.
+      </p>
+    </div>
   </div>
 
-  <form method="get" action="{% url 'diagnosticof' paciente.id %}">
-    <div class="etapa3_contenido">
-      <div class="epata3_parametros">
-        <div class="cont_btn_p">
-          <p>Incidencia pélvica</p>
-          <!-- <input id="ip1" class="contenido" /> -->
-          {{ form.pelvic_incidence }}
-        </div>
+  <form
+    id="params-form"
+    class="params-layout"
+    method="post"
+    action="{% url 'diagnosticof' paciente.id %}"
+  >
+    {% csrf_token %}
 
-        <div class="cont_btn_p">
-          <p>Inclinación pélvica</p>
-          <!-- <input id="ip2" class="contenido" /> -->
-          {{ form.pelvic_tilt }}
-        </div>
-
-        <div class="cont_btn_p">
-          <p>Ángulo de lordosis lumbar</p>
-          <!-- <input id="ip3" class="contenido" /> -->
-          {{ form.lumbar_lordosis_angle }}
-        </div>
-
-        <div class="cont_btn_p">
-          <p>Pendiente sacra</p>
-          <!-- <input id="ip4" class="contenido" /> -->
-          {{ form.sacral_slope }}
-        </div>
-
-        <div class="cont_btn_p">
-          <p>Radio pélvico</p>
-          <!-- <input id="ip5" class="contenido" /> -->
-          {{ form.pelvic_radius }}
-        </div>
-
-        <div class="cont_btn_p">
-          <p>Grado de espondilolistesis</p>
-          <!-- <input id="ip6" class="contenido" /> -->
-          {{ form.degree_spondylolisthesis }}
+    {% if form.non_field_errors %}
+      <div class="form-alert" role="alert">
+        <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+        <div>
+          {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
         </div>
       </div>
+    {% endif %}
 
-      <div class="imagen_referencia">
-        <img id="img_p" src="{% static 'img/columna.png' %}" alt="" />
+    <div class="params-fields">
+      <div class="field">
+        <label for="{{ form.pelvic_incidence.id_for_label }}">
+          Incidencia pélvica <span class="field-unit">°</span>
+        </label>
+        {{ form.pelvic_incidence }}
+        {% for error in form.pelvic_incidence.errors %}
+          <p class="field-error">{{ error }}</p>
+        {% endfor %}
       </div>
 
-      <div class="paciente_evento">
-        <div class="foto_paciente">
-          <div class="imagen_paciente">
-            {% if not paciente.foto %}
-              <img src="{% static 'img/user_default.png' %}" alt="foto del paciente" />
-            {% else %}
-              <img src="{{ paciente.foto.url }}" alt="foto del paciente" />
-            {% endif %}
-          </div>
-          <p>
-            <b>{{ paciente.primer_nombre|add:" "|add:paciente.apellido_paterno }}</b>
-          </p>
-        </div>
+      <div class="field">
+        <label for="{{ form.pelvic_tilt.id_for_label }}">
+          Inclinación pélvica <span class="field-unit">°</span>
+        </label>
+        {{ form.pelvic_tilt }}
+        {% for error in form.pelvic_tilt.errors %}
+          <p class="field-error">{{ error }}</p>
+        {% endfor %}
+      </div>
 
-        <div class="btns">
-          <a
-            href="{% url 'diagnostico' %}"
-            id="cancelar"
-            class="btn btn-outline-danger"
-            >Cancelar <i class="bi bi-x-octagon"></i
-          ></a>
-          <button
-            type="submit"
-            id="seguir"
-            class="btn btn-outline-secondary"
-            >Diagnosticar <i class="bi bi-clipboard2-pulse-fill"></i
-          ></button>
-        </div>
+      <div class="field">
+        <label for="{{ form.lumbar_lordosis_angle.id_for_label }}">
+          Ángulo de lordosis lumbar <span class="field-unit">°</span>
+        </label>
+        {{ form.lumbar_lordosis_angle }}
+        {% for error in form.lumbar_lordosis_angle.errors %}
+          <p class="field-error">{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.sacral_slope.id_for_label }}">
+          Pendiente sacra <span class="field-unit">°</span>
+        </label>
+        {{ form.sacral_slope }}
+        {% for error in form.sacral_slope.errors %}
+          <p class="field-error">{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.pelvic_radius.id_for_label }}">
+          Radio pélvico <span class="field-unit">mm</span>
+        </label>
+        {{ form.pelvic_radius }}
+        {% for error in form.pelvic_radius.errors %}
+          <p class="field-error">{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.degree_spondylolisthesis.id_for_label }}">
+          Grado de espondilolistesis <span class="field-unit">%</span>
+        </label>
+        {{ form.degree_spondylolisthesis }}
+        {% for error in form.degree_spondylolisthesis.errors %}
+          <p class="field-error">{{ error }}</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <figure class="reference-panel">
+      <div class="reference-panel__frame">
+        <img
+          id="img_p"
+          src="{% static 'img/columna.png' %}"
+          alt="Referencia anatómica de la columna"
+          loading="lazy"
+        />
+      </div>
+      <figcaption>
+        Referencia anatómica. La imagen cambia según el campo que estés
+        completando.
+      </figcaption>
+    </figure>
+
+    <div class="params-actions">
+      <div class="patient-chip">
+        {% if not paciente.foto %}
+          <img
+            src="{% static 'img/user_default.png' %}"
+            alt="Fotografía de {{ paciente.primer_nombre }} {{ paciente.apellido_paterno }}"
+            loading="lazy"
+          />
+        {% else %}
+          <img
+            src="{{ paciente.foto.url }}"
+            alt="Fotografía de {{ paciente.primer_nombre }} {{ paciente.apellido_paterno }}"
+            loading="lazy"
+          />
+        {% endif %}
+        <span class="patient-chip__meta">
+          <span class="patient-chip__name">
+            {{ paciente.primer_nombre }} {{ paciente.apellido_paterno }}
+          </span>
+          <span class="patient-chip__sub">DNI {{ paciente.dni }}</span>
+        </span>
+      </div>
+
+      <div class="params-actions__buttons">
+        <a href="{% url 'diagnostico' %}" class="btn-app btn-app--ghost">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+          Cancelar
+        </a>
+        <button type="submit" id="seguir" class="btn-app btn-app--primary">
+          Obtener diagnóstico
+          <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i>
+        </button>
       </div>
     </div>
   </form>
-</div>
+</section>
 
 <script>
-  let img = document.getElementById("img_p");
-  const iparametro1 = document.getElementById("id_pelvic_incidence");
-  const iparametro2 = document.getElementById("id_pelvic_tilt");
-  const iparametro3 = document.getElementById("id_lumbar_lordosis_angle");
-  const iparametro4 = document.getElementById("id_sacral_slope");
-  const iparametro5 = document.getElementById("id_pelvic_radius");
-  const iparametro6 = document.getElementById("id_degree_spondylolisthesis");
+  (function () {
+    const img = document.getElementById("img_p");
+    if (img) {
+      const references = [
+        {
+          input: "id_pelvic_incidence",
+          src: "{% static 'img/incidencia_pelvica.png' %}",
+          label: "Incidencia pélvica",
+        },
+        {
+          input: "id_pelvic_tilt",
+          src: "{% static 'img/inclinacion_pelvica.png' %}",
+          label: "Inclinación pélvica",
+        },
+        {
+          input: "id_lumbar_lordosis_angle",
+          src: "{% static 'img/angulo_lordosis.jpg' %}",
+          label: "Ángulo de lordosis lumbar",
+        },
+        {
+          input: "id_sacral_slope",
+          src: "{% static 'img/pendiente_sacra.jpg' %}",
+          label: "Pendiente sacra",
+        },
+        {
+          input: "id_pelvic_radius",
+          src: "{% static 'img/radio_pelvico.jpg' %}",
+          label: "Radio pélvico",
+        },
+        {
+          input: "id_degree_spondylolisthesis",
+          src: "{% static 'img/grado_espon.jpg' %}",
+          label: "Grado de espondilolistesis",
+        },
+      ];
 
-  iparametro1.addEventListener("focus", () => {
-    img.src = "{% static 'img/incidencia_pelvica.png' %}";
-  });
+      references.forEach(function (reference) {
+        const input = document.getElementById(reference.input);
+        if (!input) return;
+        input.setAttribute("inputmode", "decimal");
+        input.addEventListener("focus", function () {
+          img.src = reference.src;
+          img.alt = "Referencia: " + reference.label;
+        });
+      });
+    }
 
-  iparametro2.addEventListener("focus", () => {
-    img.src = "{% static 'img/inclinacion_pelvica.png' %}";
-  });
-
-  iparametro3.addEventListener("focus", () => {
-    img.src = "{% static 'img/angulo_lordosis.jpg' %}";
-  });
-
-  iparametro4.addEventListener("focus", () => {
-    img.src = "{% static 'img/pendiente_sacra.jpg' %}";
-  });
-
-  iparametro5.addEventListener("focus", () => {
-    img.src = "{% static 'img/radio_pelvico.jpg' %}";
-  });
-
-  iparametro6.addEventListener("focus", () => {
-    img.src = "{% static 'img/grado_espon.jpg' %}";
-  });
+    const form = document.getElementById("params-form");
+    const submit = document.getElementById("seguir");
+    if (form && submit) {
+      form.addEventListener("submit", function () {
+        submit.disabled = true;
+        submit.setAttribute("aria-busy", "true");
+        submit.innerHTML =
+          '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Analizando…';
+      });
+    }
+  })();
 </script>
 {% endblock %}

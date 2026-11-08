@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,11 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Raleway:ital,wght@0,100..900;1,100..900&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&family=Petrona:ital,wght@0,100..900;1,100..900&display=swap"
       rel="stylesheet"
     />
     <link
@@ -24,21 +20,14 @@
       integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
       crossorigin="anonymous"
     />
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-      crossorigin="anonymous"
-    ></script>
-
     <link rel="stylesheet" href="{% static 'styles/base.css' %}" />
     <link rel="stylesheet" href="{% static 'styles/dashboard.css' %}" />
-    <title>Center</title>
-    <script src="{% static 'js/base.js' %}"></script>
     <link rel="stylesheet" href="{% static 'styles/diagnostico.css' %}" />
     <link rel="stylesheet" href="{% static 'styles/etapa2.css' %}" />
     <link rel="stylesheet" href="{% static 'styles/etapa3.css' %}" />
     <link rel="stylesheet" href="{% static 'styles/etapaf.css' %}" />
     <link rel="stylesheet" href="{% static 'styles/r_paciente.css' %}" />
+    <title>{% block title %}Hospital Regional · Apoyo al diagnóstico{% endblock %}</title>
     <link
       rel="icon"
       type="image/png"
@@ -46,236 +35,284 @@
     />
   </head>
   <body>
+    <a class="skip-link" href="#main_content">Saltar al contenido</a>
+
     <div id="__next">
-      <header class="header">
-        <nav class="nav">
-          <div class="logo">
-            <button class="btn-menu-nav">
-              <i class="bi bi-list"></i>
+      <header class="app-header">
+        <div class="app-header__left">
+          <button
+            class="icon-btn menu-btn"
+            id="menu_toggle"
+            type="button"
+            aria-label="Abrir menú de navegación"
+            aria-controls="sidebar"
+            aria-expanded="false"
+          >
+            <i class="bi bi-list" aria-hidden="true"></i>
+          </button>
+
+          <a class="brand" href="{% url 'dashboard' %}">
+            <img
+              class="brand__seal"
+              src="{% static 'img/logo-hospital-transparente.png' %}"
+              alt=""
+            />
+            <span class="brand__text">
+              <span class="brand__title">Hospital Regional</span>
+              <span class="brand__subtitle">Eleazar Guzmán Barrón</span>
+            </span>
+          </a>
+        </div>
+
+        <div class="app-header__right">
+          <div class="perfil">
+            <button
+              class="perfil__trigger"
+              id="perfil_trigger"
+              type="button"
+              aria-label="Abrir menú de usuario"
+              aria-haspopup="true"
+              aria-expanded="false"
+              aria-controls="panel_conf"
+            >
+              {% if user.foto %}
+                <img id="avatar_1" src="{{ user.foto.url }}" alt="" />
+              {% else %}
+                <img
+                  id="avatar_1"
+                  src="{% static 'img/user_default.png' %}"
+                  alt=""
+                />
+              {% endif %}
+              <span class="perfil__meta">
+                <span class="perfil__name">
+                  {{ user.primer_nombre }} {{ user.apellido_paterno }}
+                </span>
+                <span class="perfil__role">
+                  {% if request.user.usuario_administrador %}Administrador{% else %}Especialista{% endif %}
+                </span>
+              </span>
+              <i class="bi bi-chevron-down perfil__chev" aria-hidden="true"></i>
             </button>
-          </div>
-          <div class="buscar"></div>
-          <div class="perfil-conf">
-            <div class="notificaciones">
-              <div class="icon" id="icon_noti">
-                <i class="bi bi-bell-fill"></i>
+
+            <div class="panel-conf d-none" id="panel_conf">
+              <div class="panel-conf__head">
+                {% if user.foto %}
+                  <img
+                    class="panel-conf__avatar"
+                    src="{{ user.foto.url }}"
+                    alt=""
+                  />
+                {% else %}
+                  <img
+                    class="panel-conf__avatar"
+                    src="{% static 'img/user_default.png' %}"
+                    alt=""
+                  />
+                {% endif %}
+                <div>
+                  <div class="panel-conf__name">
+                    {% if request.user.usuario_administrador %}
+                      {{ "Ing. "|add:user.primer_nombre|add:" "|add:user.apellido_paterno }}
+                    {% else %}
+                      {{ "Dr. "|add:user.primer_nombre|add:" "|add:user.apellido_paterno }}
+                    {% endif %}
+                  </div>
+                  <div class="panel-conf__role">
+                    {% if request.user.usuario_administrador %}Administrador del sistema{% else %}Especialista clínico{% endif %}
+                  </div>
+                </div>
               </div>
 
-              <div class="noti-panel d-none">
-                <div class="header_not">Notificaciones</div>
-                <ul class="lista_notis">
-                  <li class="notificacion">
-                    <div class="avatar_noti">
-                      <img
-                        id="avatar_1_noti"
-                        src="{% static 'img/user_default.png' %}"
-                        alt=""
-                      />
-                    </div>
-
-                    <div class="noti_contenido">
-                      <div class="asunto">Gestión de pacientes</div>
-                      <p class="descripcion">
-                        <i class="bi bi-chat-fill"></i
-                        ><span>Usted agrego un nuevo paciente</span>
-                      </p>
-                      <div class="fecha">
-                        <span>
-                          <i class="bi bi-clock"></i>
-                          12:10 PM
-                        </span>
-                        <span> Noviembre 9,2024 </span>
-                      </div>
-                    </div>
-                  </li>
-                </ul>
+              <div class="panel-conf__menu">
+                <a href="{% url 'dashboard' %}" class="panel-conf__item">
+                  <i class="bi bi-grid-1x2" aria-hidden="true"></i>
+                  <span>Resumen</span>
+                </a>
+                <a href="{% url 'perfil' %}" class="panel-conf__item">
+                  <i class="bi bi-person-circle" aria-hidden="true"></i>
+                  <span>Mi perfil</span>
+                </a>
+                <a href="{% url 'password_change' %}" class="panel-conf__item">
+                  <i class="bi bi-key" aria-hidden="true"></i>
+                  <span>Cambiar contraseña</span>
+                </a>
+                {% if request.user.usuario_administrador %}
+                  <a href="{% url 'auditoria' %}" class="panel-conf__item">
+                    <i class="bi bi-shield-check" aria-hidden="true"></i>
+                    <span>Auditoría</span>
+                  </a>
+                {% endif %}
               </div>
-            </div>
-            <div class="perfil">
-                      {% if user.foto %}
-                          <img
-                              id="avatar_1"
-                              src="{{ user.foto.url }}"
-                              alt=""
-                          />
-                      {% else %}
-                          <img
-                              id="avatar"
-                              src="{% static 'user_default.png' %}"
-                              alt=""
-                          />
-                      {% endif %}
 
-              <div class="panel-conf d-none">
-                <div class="mis_datos">
-                  
-
-                  {% if request.user.usuario_administrador %}
-                      {% if user.foto %}
-                          <img
-                              id="avatar"
-                              src="{{ user.foto.url }}"
-                              alt=""
-                          />
-                      {% else %}
-                          <img
-                              id="avatar"
-                              src="{% static 'user_default.png' %}"
-                              alt=""
-                          />
-                      {% endif %}
-
-                      <div class="nombre">
-                          {{ "Ing. "|add:user.primer_nombre|add:" "|add:user.apellido_paterno }}
-                      </div>
-                  {% else %}
-                      {% if user.foto %}
-                          <img
-                              id="avatar"
-                              src="{{ user.foto.url }}"
-                              alt=""
-                          />
-                      {% else %}
-                          <img
-                              id="avatar"
-                              src="{% static 'user_default.png' %}"
-                              alt=""
-                          />
-                      {% endif %}
-
-                      <div class="nombre">
-                          {{ "Dr. "|add:user.primer_nombre|add:" "|add:user.apellido_paterno }}
-                      </div>
-                  {% endif %}
-
-                </div>
-
-                <div class="configuraciones">
-                  <ul class="lista_opciones">
-                    <li>
-                      <div class="icon">
-                        <i class="bi bi-person-gear"></i>
-                      </div>
-                      <a href="#">Perfil</a>
-                    </li>
-                    <li>
-                      <div class="icon">
-                        <i class="bi bi-bar-chart-fill"></i>
-                      </div>
-                      <a href="{% url 'dashboard' %}">Dashboard</a>
-                    </li>
-                    <li>
-                      <div class="icon">
-                        <i class="bi bi-info-circle-fill"></i>
-                      </div>
-                      <a href="#">Centro de ayuda</a>
-                    </li>
-                    <li>
-                      <div class="icon">
-                        <i class="bi bi-gear-wide-connected"></i>
-                      </div>
-                      <a href="#">Configuraciones</a>
-                    </li>
-                  </ul>
-                </div>
-
-                <div class="logout">
-                  <!-- <a href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i>Cerrar sesión</a > -->
-                  <form method="post" action="{% url 'logout' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn_logout_sidebar">
-                      <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-                    </button>
-                  </form>
-                  <span class="leyenda"
-                    >Politica de privacidad • Terminos • Cookies</span
-                  >
-                </div>
+              <div class="panel-conf__foot">
+                <form method="post" action="{% url 'logout' %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn-app btn-app--secondary btn-app--block">
+                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                    Cerrar sesión
+                  </button>
+                </form>
+                <p class="panel-conf__legal">
+                  Política de privacidad, términos y cookies
+                </p>
               </div>
             </div>
           </div>
-        </nav>
+        </div>
       </header>
 
-      <div class="d-flex" id="main_">
-        <nav class="sidebar">
-          <ul class="opciones_sidebar">
-            <li class="opcion_sidebar">
-              <p>Core</p>
-                <a href="{% url 'dashboard' %}" class="btn_sidebar_opc">
-                  <div class="icon_dash">
-                    <i class="bi bi-bar-chart-fill"></i>
-                  </div>
-                  Dashboard
-                </a>
-            {% if request.user.usuario_administrador == 0 %}                         
+      <div class="app-shell" id="main_">
+        <div class="sidebar-backdrop" id="sidebar_backdrop"></div>
 
-                <a href="{% url 'diagnostico' %}" class="btn_sidebar_opc">
-                  <div class="icon_dash"><i class="bi bi-heart-pulse"></i></div>
-                  Diagnosticar
-                </a>
-            {% endif %}
-            </li>
-
-
-            <li class="opcion_sidebar">
-              <p>Formularios</p>
-              <a href="{% url 'especialista' %}" class="btn_sidebar_opc">
-                <div class="icon_dash">
-                  <i class="bi bi-person-badge-fill"></i>
-                </div>
-                Especialistas
+        <nav class="sidebar" id="sidebar" aria-label="Navegación principal">
+          <div class="sidebar__scroll">
+            <div class="nav-group">
+              <p class="nav-group__label">Principal</p>
+              <a
+                href="{% url 'dashboard' %}"
+                class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}is-active{% endif %}"
+                {% if request.resolver_match.url_name == 'dashboard' %}aria-current="page"{% endif %}
+              >
+                <i class="bi bi-grid-1x2" aria-hidden="true"></i>
+                <span>Resumen</span>
               </a>
 
-              
-              
-              {% if request.user.usuario_administrador %}
-                <a href="{% url 'administrador' %}" class="btn_sidebar_opc">
-                  <div class="icon_dash">
-                    <i class="bi bi-person-fill-gear"></i>
-                  </div>
-                  Administradores de Seguridad
-                </a>
-              {% else %}
-                <a href="{% url 'paciente' %}" class="btn_sidebar_opc">
-                  <div class="icon_dash"><i class="bi bi-person-heart"></i></div>
-                  Pacientes            
+              {% if request.user.usuario_administrador == 0 %}
+                <a
+                  href="{% url 'diagnostico' %}"
+                  class="nav-link {% if request.resolver_match.url_name == 'diagnostico' or request.resolver_match.url_name == 'diagnostico2' or request.resolver_match.url_name == 'diagnostico3' or request.resolver_match.url_name == 'diagnosticof' %}is-active{% endif %}"
+                  {% if request.resolver_match.url_name == 'diagnostico' or request.resolver_match.url_name == 'diagnostico2' or request.resolver_match.url_name == 'diagnostico3' or request.resolver_match.url_name == 'diagnosticof' %}aria-current="page"{% endif %}
+                >
+                  <i class="bi bi-activity" aria-hidden="true"></i>
+                  <span>Nuevo diagnóstico</span>
                 </a>
               {% endif %}
-            </li>
+            </div>
 
-            {% if request.user.usuario_administrador == 0 %}
-              <li class="opcion_sidebar">
-                <p>Historial</p>
-                <a href="{% url 'historial_d' %}" class="btn_sidebar_opc">
-                  <div class="icon_dash">
-                    <i class="bi bi-clipboard2-pulse-fill"></i>
-                  </div>
-                  Diagnósticos
-                </a>
+            <div class="nav-group">
+              <p class="nav-group__label">Registros</p>
+              <a
+                href="{% url 'paciente' %}"
+                class="nav-link {% if request.resolver_match.url_name == 'paciente' or request.resolver_match.url_name == 'registro_p' or request.resolver_match.url_name == 'paciente_detalle' or request.resolver_match.url_name == 'paciente_editar' %}is-active{% endif %}"
+                {% if request.resolver_match.url_name == 'paciente' or request.resolver_match.url_name == 'registro_p' or request.resolver_match.url_name == 'paciente_detalle' or request.resolver_match.url_name == 'paciente_editar' %}aria-current="page"{% endif %}
+              >
+                <i class="bi bi-person-heart" aria-hidden="true"></i>
+                <span>Pacientes</span>
+              </a>
 
-                <a href="{% url 'historial_m' %}" class="btn_sidebar_opc">
-                  <div class="icon_dash">
-                    <i class="bi bi-clipboard2-check"></i>
-                  </div>
-                  Mis interacciones
+              {% if request.user.usuario_administrador %}
+                <a
+                  href="{% url 'especialista' %}"
+                  class="nav-link {% if request.resolver_match.url_name == 'especialista' or request.resolver_match.url_name == 'registro_e' or nav_section == 'especialista' %}is-active{% endif %}"
+                  {% if request.resolver_match.url_name == 'especialista' or request.resolver_match.url_name == 'registro_e' or nav_section == 'especialista' %}aria-current="page"{% endif %}
+                >
+                  <i class="bi bi-person-badge" aria-hidden="true"></i>
+                  <span>Especialistas</span>
                 </a>
-              </li>
+                <a
+                  href="{% url 'administrador' %}"
+                  class="nav-link {% if request.resolver_match.url_name == 'administrador' or request.resolver_match.url_name == 'registro_a' or nav_section == 'administrador' %}is-active{% endif %}"
+                  {% if request.resolver_match.url_name == 'administrador' or request.resolver_match.url_name == 'registro_a' or nav_section == 'administrador' %}aria-current="page"{% endif %}
+                >
+                  <i class="bi bi-person-fill-gear" aria-hidden="true"></i>
+                  <span>Administradores</span>
+                </a>
+              {% endif %}
+            </div>
+
+            <div class="nav-group">
+              <p class="nav-group__label">Historial</p>
+              <a
+                href="{% url 'historial_d' %}"
+                class="nav-link {% if request.resolver_match.url_name == 'historial_d' or nav_section == 'historial_d' %}is-active{% endif %}"
+                {% if request.resolver_match.url_name == 'historial_d' or nav_section == 'historial_d' %}aria-current="page"{% endif %}
+              >
+                <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i>
+                <span>Diagnósticos</span>
+              </a>
+              {% if request.user.usuario_administrador == 0 %}
+                <a
+                  href="{% url 'historial_m' %}"
+                  class="nav-link {% if request.resolver_match.url_name == 'historial_m' or nav_section == 'historial_m' %}is-active{% endif %}"
+                  {% if request.resolver_match.url_name == 'historial_m' or nav_section == 'historial_m' %}aria-current="page"{% endif %}
+                >
+                  <i class="bi bi-clipboard2-check" aria-hidden="true"></i>
+                  <span>Mis diagnósticos</span>
+                </a>
+              {% endif %}
+            </div>
+
+            {% if request.user.usuario_administrador %}
+              <div class="nav-group">
+                <p class="nav-group__label">Sistema</p>
+                <a
+                  href="{% url 'auditoria' %}"
+                  class="nav-link {% if request.resolver_match.url_name == 'auditoria' %}is-active{% endif %}"
+                  {% if request.resolver_match.url_name == 'auditoria' %}aria-current="page"{% endif %}
+                >
+                  <i class="bi bi-shield-check" aria-hidden="true"></i>
+                  <span>Auditoría</span>
+                </a>
+              </div>
             {% endif %}
+          </div>
 
-          </ul>
-
-          <!-- <a href="{% url 'logout' %}" class="btn_logout_sidebar" ><i class="bi bi-box-arrow-right"></i>Cerrar sesión</a> -->
-          <!-- <form method="post" action="{% url 'logout' %}">
-            {% csrf_token %}
-            <button type="submit" class="btn_logout_sidebar">
-              <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-            </button>
-          </form> -->
+          <div class="sidebar__footer">
+            <div class="sidebar-user">
+              {% if user.foto %}
+                <img src="{{ user.foto.url }}" alt="" />
+              {% else %}
+                <img src="{% static 'img/user_default.png' %}" alt="" />
+              {% endif %}
+              <div class="sidebar-user__meta">
+                <span class="sidebar-user__name">
+                  {{ user.primer_nombre }} {{ user.apellido_paterno }}
+                </span>
+                <span class="sidebar-user__role">
+                  {% if request.user.usuario_administrador %}Administrador{% else %}Especialista{% endif %}
+                </span>
+              </div>
+              <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button
+                  type="submit"
+                  class="icon-btn icon-btn--onDark"
+                  aria-label="Cerrar sesión"
+                  title="Cerrar sesión"
+                >
+                  <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                </button>
+              </form>
+            </div>
+          </div>
         </nav>
 
-        <div class="main_content">{% block content %} {% endblock %}</div>
+        <main class="main_content" id="main_content">
+          <div class="page-shell">
+            {% if DEMO_MODE %}
+              <div class="app-alert app-alert--warning demo-banner" role="status">
+                <i class="bi bi-info-circle" aria-hidden="true"></i>
+                <p>Modo demo compartido: los cambios que realices pueden ser visibles para otros visitantes y se restauran automáticamente cada hora.</p>
+              </div>
+            {% endif %}
+            {% if messages %}
+              <div class="app-messages" role="status" aria-live="polite">
+                {% for message in messages %}
+                  <div class="app-alert app-alert--{{ message.tags|default:'info' }}">
+                    <i class="bi {% if 'success' in message.tags %}bi-check-circle{% elif 'error' in message.tags %}bi-exclamation-octagon{% elif 'warning' in message.tags %}bi-exclamation-triangle{% else %}bi-info-circle{% endif %}" aria-hidden="true"></i>
+                    <p>{{ message }}</p>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+            {% block content %} {% endblock %}
+          </div>
+        </main>
       </div>
     </div>
+
+    <script src="{% static 'js/base.js' %}"></script>
+    {% block extra_js %}{% endblock %}
   </body>
 </html>
