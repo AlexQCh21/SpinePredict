@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: spinepredict
+    runtime: docker
+    plan: free
+    region: oregon
+    branch: main
+    healthCheckPath: /healthz/
+    autoDeployTrigger: commit
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "0"
+      - key: DEMO_MODE
+        value: "1"
+      - key: GUNICORN_WORKERS
+        value: "1"
+      - key: GUNICORN_TIMEOUT
+        value: "120"
+      - key: OMP_NUM_THREADS
+        value: "1"
+      - key: OPENBLAS_NUM_THREADS
+        value: "1"
+      - key: MKL_NUM_THREADS
+        value: "1"
+      - key: MALLOC_ARENA_MAX
+        value: "2"

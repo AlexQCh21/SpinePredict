@@ -57,6 +57,16 @@ if not ALLOWED_HOSTS:
 
 CSRF_TRUSTED_ORIGINS = _env_list('DJANGO_CSRF_TRUSTED_ORIGINS')
 
+_render_host = os.environ.get('RENDER_EXTERNAL_HOSTNAME', '').strip()
+if _render_host and _render_host not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(_render_host)
+
+_render_url = os.environ.get('RENDER_EXTERNAL_URL', '').strip().rstrip('/')
+if _render_url and _render_url not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append(_render_url)
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
@@ -132,7 +142,7 @@ if DATABASE_URL and not TESTING:
     DATABASES['default'] = dj_database_url.parse(
         DATABASE_URL,
         conn_max_age=int(os.environ.get('DB_CONN_MAX_AGE', '60')),
-        ssl_require=_env_bool('DB_SSL_REQUIRE', default=False),
+        # ssl_require=_env_bool('DB_SSL_REQUIRE', default=False),
     )
     if os.environ.get('DB_DISABLE_SERVER_SIDE_CURSORS', '').lower() in ('1', 'true', 'yes', 'on'):
         DATABASES['default'].setdefault('OPTIONS', {})
@@ -176,7 +186,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Storage / media
