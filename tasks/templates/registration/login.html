@@ -119,8 +119,19 @@
             </div>
           {% endif %}
 
-          <div class="auth__foot">
-            Hospital Regional Eleazar Guzmán Barrón, Nuevo Chimbote
+          <div class="auth__foot auth__foot--legal">
+            <p class="auth__legal-note">
+              Proyecto personal de demostración. No es un sistema oficial del
+              Hospital Regional Eleazar Guzmán Barrón.
+            </p>
+            <button
+              type="button"
+              class="legal-link"
+              data-legal-open
+              aria-haspopup="dialog"
+            >
+              Aviso legal
+            </button>
           </div>
         </div>
       </section>
@@ -143,6 +154,8 @@
         <div class="auth__visual-footer">Servicio de diagnóstico por imágenes</div>
       </aside>
     </main>
+
+    {% include 'partials/legal_notice.html' %}
 
     {% if messages %}
       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -197,5 +210,6 @@
         }
       })();
     </script>
+    <script src="{% static 'js/legal.js' %}"></script>
   </body>
 </html>

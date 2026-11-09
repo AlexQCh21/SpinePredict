@@ -52,7 +52,23 @@
         </div>
       </section>
 
-      <p class="error-foot">Sistema de apoyo al diagnóstico · Traumatología</p>
+      <div class="error-foot">
+        <p class="error-foot__note">
+          Proyecto personal de demostración. No es un sistema oficial del
+          Hospital Regional Eleazar Guzmán Barrón.
+        </p>
+        <button
+          type="button"
+          class="legal-link"
+          data-legal-open
+          aria-haspopup="dialog"
+        >
+          Aviso legal
+        </button>
+      </div>
     </main>
+
+    {% include 'partials/legal_notice.html' %}
+    <script src="{% static 'js/legal.js' %}"></script>
   </body>
 </html>

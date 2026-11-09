@@ -154,7 +154,14 @@
                   </button>
                 </form>
                 <p class="panel-conf__legal">
-                  Política de privacidad, términos y cookies
+                  <button
+                    type="button"
+                    class="legal-link"
+                    data-legal-open
+                    aria-haspopup="dialog"
+                  >
+                    Aviso legal
+                  </button>
                 </p>
               </div>
             </div>
@@ -308,11 +315,29 @@
             {% endif %}
             {% block content %} {% endblock %}
           </div>
+
+          <footer class="app-footer">
+            <p class="app-footer__text">
+              Proyecto personal de demostración. No es un sistema oficial del
+              Hospital Regional Eleazar Guzmán Barrón.
+            </p>
+            <button
+              type="button"
+              class="legal-link"
+              data-legal-open
+              aria-haspopup="dialog"
+            >
+              Aviso legal
+            </button>
+          </footer>
         </main>
       </div>
     </div>
 
+    {% include 'partials/legal_notice.html' %}
+
     <script src="{% static 'js/base.js' %}"></script>
+    <script src="{% static 'js/legal.js' %}"></script>
     {% block extra_js %}{% endblock %}
   </body>
 </html>
